@@ -1,20 +1,25 @@
 {
-  "manifest_version": 2,
+    "manifest_version": 2,
 
-  "name": "Better SoundCloud",
-  "description": "An extension to make soundcloud better",
-  "version": "1.0",
+    "name": "Better SoundCloud",
+    "description": "An extension to make soundcloud better",
+    "version": "1.0",
 
-  "content_scripts": [{
-    "matches": ["*://soundcloud.com/*"],
-	"css": ["better_sc.css"],
-	"js": ["sdk-3.1.2.js", "better_sc.js"]
-  }],
-  
-  "options_page": "options.html",
-  
-  "permissions": [
-    "activeTab",
-	"storage"
-  ]
+    "content_scripts": [{
+        "matches": ["*://soundcloud.com/*"],
+        "css": ["better_sc.css"],
+        "js": ["sdk-3.1.2.js", "better_sc.js"],
+        "run_at": "document_start"
+    }],
+
+    "web_accessible_resources": [
+        "bsc_injected.js"
+    ],
+
+    "options_page": "options.html",
+
+    "permissions": [
+        "activeTab",
+        "storage"
+    ]
 }

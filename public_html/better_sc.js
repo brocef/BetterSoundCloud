@@ -152,13 +152,9 @@ SC.initialize({
 });
 
 var sc_objs = [];
-if (getTargetList() === null) {
-    docReady(function() {	
-            init();
-    });
-} else {
-    init();
-}
+docReady(function() {	
+        init();
+});
 
 function init() {
     chrome.storage.sync.get({
@@ -203,3 +199,16 @@ function init() {
     });
 }
 
+var init_script = document.createElement("script");
+init_script.src = "chrome-extension://" + chrome.runtime.id + "/bsc_injected.js";
+// TODO: Better logic for inserting new script
+// Should probably insert into HEAD not HTML, but who knows what exists at the time
+var loopInject = function(){
+    if ( document.head )
+    {   
+        document.head.appendChild(init_script);
+        return 0;
+    }
+    setTimeout(loopInject, 5); // 5 ms
+};
+loopInject();
