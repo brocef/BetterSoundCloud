@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>SoundCloud Better</title>
+<link href="options.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+
+<div id="bsc_frame">
+
+<h1 class="bsc_centered_text">Better SoundCloud</h1>
+<h2 class="bsc_centered_text">Because it needs help</h2>
+<h3 class="bsc_centered_text">By Brian Cefali</h3>
+<span class="bsc_centered_text bsc_hidden" id="status_span"></span>
+<table class="bsc_options_table">
+	<tr>
+		<td><label for="min_duration">Minimum Song Duration (Seconds, 0  = no minimum)</label></td>
+		<td><input class="bsc_option" id="min_duration" name="min_duration" type="text" /></td>
+	</tr>
+	<tr>
+		<td><label for="max_duration">Maximum Song Duration (Seconds, -1 = no maximum)</label></td>
+		<td><input class="bsc_option" id="max_duration" name="max_duration" type="text" /></td>
+	</tr>
+	<tr>
+		<td colspan="2"><button id="save">Save</button></td>
+	</tr>
+</table>
+
+</div>
+
+<script src="options.js"></script>
+</body>
+</html>
