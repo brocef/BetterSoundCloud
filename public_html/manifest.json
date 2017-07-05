@@ -8,7 +8,7 @@
     "content_scripts": [{
         "matches": ["*://soundcloud.com/*"],
         "css": ["better_sc.css"],
-        "js": ["sdk-3.1.2.js", "better_sc.js"],
+        "js": ["better_sc.js"],
         "run_at": "document_start"
     }],
 
