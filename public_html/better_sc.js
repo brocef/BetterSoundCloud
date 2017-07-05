@@ -99,6 +99,9 @@ function parseTimeString(hms_time) {
 
 function parseFancyNumber(num) {
     var spl = /^([\d,.]+)([MK])?$/.exec(num);
+    if (!spl) {
+        return -1;
+    }
     num = spl[1].split(",").join("");
     num = parseFloat(num);
     if (spl[2] === "K") {
@@ -111,7 +114,7 @@ function parseFancyNumber(num) {
 
 function processSCItemWhenLoaded(sc_item, cfg) {
     var getDurCanvas = function() {
-        return sc_item.querySelector("div.sound__waveform > div.waveform > div.waveform__layer > canvas.bscInitialized");
+        return sc_item.querySelector("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscInitialized");
     };
     var waitForCanvas = function(){
         if (getDurCanvas())
@@ -129,11 +132,6 @@ function parseSCItem(sc_item) {
         return sc_item.querySelector(selector);
     };
     
-    var is_playlist = sel("div > div.playlist") !== null;
-    if (is_playlist) {
-        return {playlist: true};
-    }
-    
     var artist_a = sel("div.soundTitle__secondary > a.soundTitle__username");
     var reposter_a = sel("div.soundTitle__secondary > div.soundTitle__info > a.actorUser, div.activity > div.streamContext > div.soundContext > span.soundContext__line > a:first-child");
     var track_a = sel("div.soundTitle__titleContainer > div > a.soundTitle__title");
@@ -144,7 +142,9 @@ function parseSCItem(sc_item) {
     var dl_a = sel("div.sound__footer > div.sound__soundActions a.soundActions__purchaseLink");
     var plays_span = sel("div.sound__footer > div.sound__footerRight div.sound__soundStats li:nth-child(1) > span > span:nth-child(2)");
     var comments_li = sel("div.sound__footer > div.sound__footerRight div.sound__soundStats li:nth-child(2) > a > span:nth-child(2)");
-    var duration_canvas = sel("div.sound__waveform > div.waveform > div.waveform__layer > canvas.bscInitialized");
+    var duration_canvas = sel("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscInitialized");
+    
+    var is_playlist = sel("div > div.playlist") !== null;
     
     var artist = {
         name: artist_a.textContent.trim(),
@@ -187,12 +187,16 @@ function parseSCItem(sc_item) {
         var download = null;
     }
     
-    var plays = parseFancyNumber(plays_span.textContent.trim());
+    if (plays_span) {
+        var plays = parseFancyNumber(plays_span.textContent.trim());
+    } else {
+        var plays = -1;
+    }
     
     if (comments_li !== null) {
         var comments = parseFancyNumber(comments_li.textContent.trim());
     } else {
-        var comments = null;
+        var comments = -1;
     }
     
     var dur_raw = duration_canvas.getAttribute("duration").trim();
@@ -204,6 +208,7 @@ function parseSCItem(sc_item) {
     
     return {
         dom: {
+            sc_item: sc_item,
             artist_a: artist_a,
             reposter_a: reposter_a,
             track_a: track_a,
@@ -229,13 +234,34 @@ function parseSCItem(sc_item) {
             comments: comments,
             duration: duration
         },
-        playlist: false
+        playlist: is_playlist
     };
 }
 
 function processSCItem(sc_item, cfg) {
     var sc_obj = parseSCItem(sc_item);
-    console.log(sc_obj);
+    var bsc_repl = document.createElement("div");
+    bsc_repl.classList.add("filteredLineDiv");
+    
+    if (sc_obj.playlist) {
+        sc_item.querySelector("div").classList.add("filteredTrack");
+        var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is a playlist");
+        bsc_repl.appendChild(bsc_repl_msg);
+        sc_item.appendChild(bsc_repl);
+    } else {
+        var sc_dur = sc_obj.values.duration.duration;
+        if (cfg.minimumTrackDuration > 0 && sc_dur < cfg.minimumTrackDuration) {
+            sc_item.querySelector("div").classList.add("filteredTrack");
+            var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is too short");
+            bsc_repl.appendChild(bsc_repl_msg);
+            sc_item.appendChild(bsc_repl);
+        } else if (cfg.maximumTrackDuration > 0 && sc_dur > cfg.maximumTrackDuration) {
+            sc_item.querySelector("div").classList.add("filteredTrack");
+            var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is too long");
+            bsc_repl.appendChild(bsc_repl_msg);
+            sc_item.appendChild(bsc_repl);
+        }
+    }
 }
 
 function initialParse(cfg) {
