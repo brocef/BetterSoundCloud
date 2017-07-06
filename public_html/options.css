@@ -1,66 +1,66 @@
 html, body {
-	width: 100%;
-	height: 100%;
+    width: 100%;
+    height: 100%;
 }
 
 #bsc_frame {
-	min-width: 300px;
-	width: 100%;
-	height: auto;
+    min-width: 300px;
+    width: 100%;
+    height: auto;
 }
 
 .bsc_centered_text {
-	display: block;
-	text-align: center;
+    display: block;
+    text-align: center;
 }
 
 #bsc_frame h1 {
-	margin: 0 0 10px 0;
-	font-family: "Bookman Old Style";
-	font-size: 24px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: 500;
-	line-height: 26.4px;
+    margin: 0 0 10px 0;
+    font-family: "Bookman Old Style";
+    font-size: 24px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+    line-height: 26.4px;
 }
 
 #bsc_frame > h2 {
-	margin: 0 0 20px 0;
-	font-family: "Bookman Old Style";
-	font-size: 18px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: 500;
-	line-height: 19.4px;
+    margin: 0 0 20px 0;
+    font-family: "Bookman Old Style";
+    font-size: 18px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 500;
+    line-height: 19.4px;
 }
 
 p, td {
-	font-family: "Bookman Old Style";
-	font-size: 14px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: 400;
-	line-height: 20px;
+    font-family: "Bookman Old Style";
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 20px;
 }
 
 .bsc_hidden {
-	display: hidden;
+    display: none;
 }
 
 #status_span {
-	margin: 5px 0;
+    margin: 5px 0;
 }
 
 .bsc_error {
-	color: red;
+    color: red;
 }
 
 .bsc_info {
-	color: green;
+    color: green;
 }
 
 .bsc_warning {
-	color: yellow;
+    color: yellow;
 }
 
 input {
@@ -68,10 +68,10 @@ input {
 }
 
 .bsc_options_table {
-	width: 100%;
-	height: auto;
-	max-width: 600px;
-	margin: 0 auto;
+    width: 100%;
+    height: auto;
+    max-width: 600px;
+    margin: 0 auto;
 }
 
 .bsc_options_table tr > td:nth-child(3) {
@@ -89,16 +89,16 @@ input {
 }
 
 #save {
-	font-family: "Bookman Old Style";
-	font-size: 18px;
-	font-style: normal;
-	font-variant: normal;
-	font-weight: 400;
-	line-height: 22px;
+    font-family: "Bookman Old Style";
+    font-size: 18px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 22px;
 
-	display: block;
-	margin: 20px auto 0 auto;
-	text-align: center;
-	min-width: 100px;
+    display: block;
+    margin: 20px auto 0 auto;
+    text-align: center;
+    min-width: 100px;
 }
 

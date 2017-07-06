@@ -243,12 +243,12 @@ function processSCItem(sc_item, cfg) {
     var bsc_repl = document.createElement("div");
     bsc_repl.classList.add("filteredLineDiv");
     
-    if (sc_obj.playlist) {
+    if (sc_obj.playlist && !cfg.allowPlaylists) {
         sc_item.querySelector("div").classList.add("filteredTrack");
         var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is a playlist");
         bsc_repl.appendChild(bsc_repl_msg);
         sc_item.appendChild(bsc_repl);
-    } else {
+    } else if (!sc_obj.playlist) {
         var sc_dur = sc_obj.values.duration.duration;
         if (cfg.minimumTrackDuration > 0 && sc_dur < cfg.minimumTrackDuration) {
             sc_item.querySelector("div").classList.add("filteredTrack");
