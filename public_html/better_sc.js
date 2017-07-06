@@ -8,7 +8,7 @@
  * @param {type} baseObj
  * @returns {undefined}
  */
-(function(funcName, baseObj) {
+(function (funcName, baseObj) {
     // The public function name defaults to window.docReady
     // but you can pass in your own object and own function name and those will be used
     // if you want to put them in a different namespace
@@ -39,7 +39,7 @@
     }
 
     function readyStateChange() {
-        if ( document.readyState === "complete" ) {
+        if (document.readyState === "complete") {
             ready();
         }
     }
@@ -48,14 +48,16 @@
     // docReady(fn, context);
     // the context argument is optional - if present, it will be passed
     // as an argument to the callback
-    baseObj[funcName] = function(callback, context) {
+    baseObj[funcName] = function (callback, context) {
         if (typeof callback !== "function") {
             throw new TypeError("callback for docReady(fn) must be a function");
         }
         // if ready has already fired, then just schedule the callback
         // to fire asynchronously, but right away
         if (readyFired) {
-            setTimeout(function() {callback(context);}, 1);
+            setTimeout(function () {
+                callback(context);
+            }, 1);
             return;
         } else {
             // add the function and context to the list
@@ -93,7 +95,7 @@ function parseTimeString(hms_time) {
     minutes = parseInt(minutes);
     var seconds = dur_split[3];
     seconds = parseInt(seconds);
-    
+
     return seconds + (minutes * 60) + (hours * 60 * 60);
 }
 
@@ -113,10 +115,10 @@ function parseFancyNumber(num) {
 }
 
 function processSCItemWhenLoaded(sc_item, cfg) {
-    var getDurCanvas = function() {
+    var getDurCanvas = function () {
         return sc_item.querySelector("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscInitialized");
     };
-    var waitForCanvas = function(){
+    var waitForCanvas = function () {
         if (getDurCanvas())
         {
             processSCItem(sc_item, cfg);
@@ -128,10 +130,10 @@ function processSCItemWhenLoaded(sc_item, cfg) {
 }
 
 function parseSCItem(sc_item) {
-    var sel = function(selector) {
+    var sel = function (selector) {
         return sc_item.querySelector(selector);
     };
-    
+
     var artist_a = sel("div.soundTitle__secondary > a.soundTitle__username");
     var reposter_a = sel("div.soundTitle__secondary > div.soundTitle__info > a.actorUser, div.activity > div.streamContext > div.soundContext > span.soundContext__line > a:first-child");
     var track_a = sel("div.soundTitle__titleContainer > div > a.soundTitle__title");
@@ -143,24 +145,24 @@ function parseSCItem(sc_item) {
     var plays_span = sel("div.sound__footer > div.sound__footerRight div.sound__soundStats li:nth-child(1) > span > span:nth-child(2)");
     var comments_li = sel("div.sound__footer > div.sound__footerRight div.sound__soundStats li:nth-child(2) > a > span:nth-child(2)");
     var duration_canvas = sel("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscInitialized");
-    
+
     var is_playlist = sel("div > div.playlist") !== null;
-    
+
     var artist = {
         name: artist_a.textContent.trim(),
         link: artist_a.href
     };
-    
+
     var reposter = {
         name: reposter_a.textContent.trim(),
         link: reposter_a.href
     };
-    
+
     var track = {
         name: track_a.textContent.trim(),
         link: track_a.href
     };
-    
+
     if (post_time !== null) {
         var timestamp = {
             time: post_time.getAttribute('datetime')
@@ -168,16 +170,16 @@ function parseSCItem(sc_item) {
     } else {
         var timestamp = null;
     }
-    
+
     var tags = [];
     if (tags_a !== null) {
         tags.push(tags_a.textContent.trim());
     }
-    
+
     var likes = parseFancyNumber(like_btn.textContent.trim());
-    
+
     var reposts = parseFancyNumber(repost_btn.textContent.trim());
-    
+
     if (dl_a !== null) {
         var download = {
             text: dl_a.textContent.trim(),
@@ -186,26 +188,26 @@ function parseSCItem(sc_item) {
     } else {
         var download = null;
     }
-    
+
     if (plays_span) {
         var plays = parseFancyNumber(plays_span.textContent.trim());
     } else {
         var plays = -1;
     }
-    
+
     if (comments_li !== null) {
         var comments = parseFancyNumber(comments_li.textContent.trim());
     } else {
         var comments = -1;
     }
-    
+
     var dur_raw = duration_canvas.getAttribute("duration").trim();
     var dur = parseTimeString(dur_raw);
     var duration = {
         duration_raw: dur_raw,
         duration: dur
     };
-    
+
     return {
         dom: {
             sc_item: sc_item,
@@ -242,7 +244,7 @@ function processSCItem(sc_item, cfg) {
     var sc_obj = parseSCItem(sc_item);
     var bsc_repl = document.createElement("div");
     bsc_repl.classList.add("filteredLineDiv");
-    
+
     if (sc_obj.playlist && !cfg.allowPlaylists) {
         sc_item.querySelector("div").classList.add("filteredTrack");
         var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is a playlist");
@@ -266,7 +268,7 @@ function processSCItem(sc_item, cfg) {
 
 function initialParse(cfg) {
     var sc_items = document.querySelectorAll("li.soundList__item");
-    for (var i=0; i<sc_items.length; i++) {
+    for (var i = 0; i < sc_items.length; i++) {
         processSCItem(sc_items[i], cfg);
     }
 }
@@ -277,57 +279,67 @@ function getTargetList() {
 
 function init() {
     chrome.storage.sync.get({
-		minimumTrackDuration: 0,
-		maximumTrackDuration: -1
-	}, function(cfg) {
-	
-        var loopInject = function(){
-            if (getTargetList() && document.querySelector("canvas.bscInitialized"))
-            {   
-                var target = getTargetList();
-                // create an observer instance
-                var observer = new MutationObserver(function(mutations) {
-                        mutations.forEach(function(mutation) {
-                                var new_nodes = mutation.addedNodes;
-                                if (new_nodes.length !== 1) {
-                                        console.log("Warning! Unexpected number of new children in single mutation");
-                                }
-                                var sc_item = new_nodes.item(0);
-                                
-                                processSCItemWhenLoaded(sc_item, cfg);
-                        });
-                });
+        minimumTrackDuration: 0,
+        maximumTrackDuration: -1,
+        allowPlaylists: false
+    }, function (cfg) {
 
-                // configuration of the observer:
-                var config = { attributes: false, childList: true, characterData: false };
-
-                // pass in the target node, as well as the observer options
-                observer.observe(target, config);
-
-                // later, you can stop observing
-                // observer.disconnect();
-
-                initialParse(cfg);
-                return 0;
-            }
-            setTimeout(loopInject, 5); // 5 ms
+        var loopCond = function () {
+            return getTargetList() && document.querySelector("canvas.bscInitialized");
         };
-        loopInject();
+
+        var loopBody = function () {
+            var target = getTargetList();
+            // create an observer instance
+            var observer = new MutationObserver(function (mutations) {
+                mutations.forEach(function (mutation) {
+                    var new_nodes = mutation.addedNodes;
+                    if (new_nodes.length !== 1) {
+                        console.log("Warning! Unexpected number of new children in single mutation");
+                    }
+                    var sc_item = new_nodes.item(0);
+
+                    processSCItemWhenLoaded(sc_item, cfg);
+                });
+            });
+
+            // configuration of the observer:
+            var config = {attributes: false, childList: true, characterData: false};
+
+            // pass in the target node, as well as the observer options
+            observer.observe(target, config);
+
+            // later, you can stop observing
+            // observer.disconnect();
+
+            initialParse(cfg);
+        };
+        
+        loopInject(loopCond, loopBody, 5);
     });
 }
 
 var init_script = document.createElement("script");
 init_script.src = "chrome-extension://" + chrome.runtime.id + "/bsc_injected.js";
-// TODO: Better logic for inserting new script
-// Should probably insert into HEAD not HTML, but who knows what exists at the time
-var loopInject = function(){
-    if (document.head)
-    {   
-        document.head.appendChild(init_script);
-        return 0;
-    }
-    setTimeout(loopInject, 5); // 5 ms
-};
-loopInject();
+
+function loopInject(condition_fn, body_fn, timeout) {
+    var lerp = function () {
+        if (condition_fn())
+        {
+            body_fn();
+            return 0;
+        }
+        setTimeout(lerp, timeout);
+    };
+    lerp();
+}
+
+loopInject(
+        function () {
+            return document.head;
+        },
+        function () {
+            document.head.appendChild(init_script);
+        }, 5);
 
 docReady(init);

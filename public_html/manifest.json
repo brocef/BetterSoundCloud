@@ -2,8 +2,9 @@
     "manifest_version": 2,
 
     "name": "Better SoundCloud",
+    "short_name": "Better SoundCloud",
     "description": "An extension to make soundcloud better",
-    "version": "1.0.1",
+    "version": "1.0.3",
     
     "icons": {
         "16": "bsc16.png",
