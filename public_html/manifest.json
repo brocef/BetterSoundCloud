@@ -4,12 +4,24 @@
     "name": "Better SoundCloud",
     "short_name": "Better SoundCloud",
     "description": "An extension to make soundcloud better",
-    "version": "1.0.5",
+    "version": "1.0.6",
     
     "icons": {
         "16": "bsc16.png",
+        "32": "bsc32.png",
         "48": "bsc48.png",
         "128": "bsc128.png"
+    },
+    
+    "browser_action": {
+        "default_icon": {
+            "16": "bsc16.png",
+            "32": "bsc32.png",
+            "48": "bsc48.png",
+            "128": "bsc128.png"
+        },
+        "default_title": "Better SoundCloud",
+        "default_popup": "popup.html"
     },
 
     "content_scripts": [{
