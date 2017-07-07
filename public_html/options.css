@@ -1,12 +1,20 @@
 html, body {
     width: 100%;
     height: 100%;
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 20px;
 }
 
 #bsc_frame {
     min-width: 300px;
     width: 100%;
+    max-width: 600px;
     height: auto;
+    margin: 0 auto;
 }
 
 .bsc_centered_text {
@@ -16,7 +24,7 @@ html, body {
 
 #bsc_frame h1 {
     margin: 0 0 10px 0;
-    font-family: "Bookman Old Style";
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     font-size: 24px;
     font-style: normal;
     font-variant: normal;
@@ -26,21 +34,12 @@ html, body {
 
 #bsc_frame > h2 {
     margin: 0 0 20px 0;
-    font-family: "Bookman Old Style";
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     font-size: 18px;
     font-style: normal;
     font-variant: normal;
     font-weight: 500;
     line-height: 19.4px;
-}
-
-p, td {
-    font-family: "Bookman Old Style";
-    font-size: 14px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 400;
-    line-height: 20px;
 }
 
 .bsc_hidden {
@@ -70,7 +69,6 @@ input {
 .bsc_options_table {
     width: 100%;
     height: auto;
-    max-width: 600px;
     margin: 0 auto;
 }
 
@@ -89,7 +87,7 @@ input {
 }
 
 #save {
-    font-family: "Bookman Old Style";
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
     font-size: 18px;
     font-style: normal;
     font-variant: normal;

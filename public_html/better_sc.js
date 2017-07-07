@@ -322,7 +322,6 @@ function init() {
         maximumTrackDuration: -1,
         allowPlaylists: false
     }, function (cfg) {
-
         var loopCond = function () {
             return getTargetList() && document.querySelector("canvas.bscInitialized");
         };
@@ -376,10 +375,36 @@ function loopInject(condition_fn, body_fn, timeout) {
 
 loopInject(
         function () {
-            return document.head;
+            return document.querySelector("#content");
         },
         function () {
             document.head.appendChild(init_script);
         }, 5);
 
-docReady(init);
+/**
+ * First time init
+ * @returns {undefined}
+ */
+docReady(function () {
+    loopInject(
+            function () {
+                return document.querySelector("#content");
+            },
+            function () {
+                var content = document.querySelector("#content");
+                var content_obs = new MutationObserver(function (mutations) {
+                    for (var i = 0; i < mutations.length; i++) {
+                        if (mutations[i].removedNodes.length > 0) {
+                            init();
+                            return;
+                        }
+                    }
+                });
+                content_obs.observe(content, {
+                    childList: true,
+                    attributes: false,
+                    characterData: false
+                });
+                init();
+            }, 5);
+});
