@@ -34,7 +34,7 @@ function restore_options() {
     chrome.storage.sync.get({
         minimumTrackDuration: 0,
         maximumTrackDuration: -1,
-        allowPlaylists: false
+        allowPlaylists: true
     }, function (items) {
         document.getElementById('min_duration').value = items.minimumTrackDuration;
         document.getElementById('max_duration').value = items.maximumTrackDuration;
