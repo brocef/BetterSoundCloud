@@ -1,16 +1,23 @@
 .seenTitle {
-	color: blue !important;
+    color: blue !important;
 }
 
 .filteredTrack {
-	display: none;
+    display: none;
 }
 
 .errTitle {
-	color: red !important;
+    color: red !important;
 }
 
 .filteredLineDiv {
-	display: block;
-	font-size: 10pt;
+    display: block;
+    font-size: 10pt;
+}
+
+.bsc_show {
+    font-family: "Courier New", Courier, monospace;
+    cursor: pointer;
+    color: #2222FF;
+    margin: 0 0 0 10px;
 }

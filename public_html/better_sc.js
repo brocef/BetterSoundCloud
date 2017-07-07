@@ -242,29 +242,68 @@ function parseSCItem(sc_item) {
 
 function processSCItem(sc_item, cfg) {
     var sc_obj = parseSCItem(sc_item);
-    var bsc_repl = document.createElement("div");
-    bsc_repl.classList.add("filteredLineDiv");
 
-    if (sc_obj.playlist && !cfg.allowPlaylists) {
-        sc_item.querySelector("div").classList.add("filteredTrack");
-        var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is a playlist");
-        bsc_repl.appendChild(bsc_repl_msg);
-        sc_item.appendChild(bsc_repl);
-    } else if (!sc_obj.playlist) {
-        var sc_dur = sc_obj.values.duration.duration;
-        if (cfg.minimumTrackDuration > 0 && sc_dur < cfg.minimumTrackDuration) {
-            sc_item.querySelector("div").classList.add("filteredTrack");
-            var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is too short");
-            bsc_repl.appendChild(bsc_repl_msg);
-            sc_item.appendChild(bsc_repl);
-        } else if (cfg.maximumTrackDuration > 0 && sc_dur > cfg.maximumTrackDuration) {
-            sc_item.querySelector("div").classList.add("filteredTrack");
-            var bsc_repl_msg = document.createTextNode(sc_obj.values.track.name + " was filtered out because it is too long");
-            bsc_repl.appendChild(bsc_repl_msg);
-            sc_item.appendChild(bsc_repl);
+    for (var i = 0; i < filters.length; i++) {
+        var r = filters[i](sc_obj, cfg);
+        if (!r) {
+            continue;
         }
+        var sc_item_div = sc_item.querySelector("div");
+
+        var bsc_repl = document.createElement("div");
+        bsc_repl.classList.add("filteredLineDiv");
+
+        var bsc_repl_p = document.createElement("p");
+        var bsc_repl_msg = document.createTextNode(r);
+        bsc_repl_p.appendChild(bsc_repl_msg);
+
+        var bsc_repl_show = document.createElement("span");
+        bsc_repl_show.textContent = "[show]";
+        bsc_repl_show.classList.add("bsc_show");
+        bsc_repl_p.appendChild(bsc_repl_show);
+
+        sc_item_div.classList.add("filteredTrack");
+        bsc_repl_show.addEventListener("click", mkHideShowClickListener(sc_item_div));
+
+        sc_item.insertBefore(bsc_repl_p, sc_item_div);
+
+        break;
     }
 }
+
+function mkHideShowClickListener(sc_item_div) {
+    var bsc = sc_item_div;
+    return function (evt) {
+        bsc.classList.toggle("filteredTrack");
+        if (bsc.classList.contains("filteredTrack")) {
+            evt.currentTarget.textContent = "[show]";
+        } else {
+            evt.currentTarget.textContent = "[hide]";
+        }
+    };
+}
+
+function filter_playlist(sc_obj, cfg) {
+    if (!cfg.allowPlaylists && sc_obj.playlist) {
+        return sc_obj.values.track.name + " was filtered out because it is a playlist";
+    }
+    return false;
+}
+
+function filter_trackDuration(sc_obj, cfg) {
+    var sc_dur = sc_obj.values.duration.duration;
+    if (cfg.minimumTrackDuration > 0 && sc_dur < cfg.minimumTrackDuration) {
+        return sc_obj.values.track.name + " was filtered out because it is too short";
+    } else if (cfg.maximumTrackDuration > 0 && sc_dur > cfg.maximumTrackDuration) {
+        return sc_obj.values.track.name + " was filtered out because it is too long";
+    }
+    return false;
+}
+
+var filters = [
+    filter_playlist,
+    filter_trackDuration
+];
 
 function initialParse(cfg) {
     var sc_items = document.querySelectorAll("li.soundList__item");
@@ -303,18 +342,19 @@ function init() {
                 });
             });
 
-            // configuration of the observer:
-            var config = {attributes: false, childList: true, characterData: false};
+            var config = {
+                attributes: false,
+                childList: true,
+                characterData: false
+            };
 
-            // pass in the target node, as well as the observer options
             observer.observe(target, config);
 
-            // later, you can stop observing
             // observer.disconnect();
 
             initialParse(cfg);
         };
-        
+
         loopInject(loopCond, loopBody, 5);
     });
 }
