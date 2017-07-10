@@ -20,11 +20,13 @@ function save_options() {
     var min_duration = document.getElementById('min_duration').value;
     var max_duration = document.getElementById('max_duration').value;
     var allow_playlists = document.getElementById('allow_playlists').checked;
+    var allow_reposts = document.getElementById('allow_reposts').checked;
 
     chrome.storage.sync.set({
         minimumTrackDuration: min_duration,
         maximumTrackDuration: max_duration,
-        allowPlaylists: allow_playlists
+        allowPlaylists: allow_playlists,
+        allowReposts: allow_reposts
     }, function () {
         setStatus("Settings saved successfully", "info");
     });
@@ -34,13 +36,16 @@ function restore_options() {
     chrome.storage.sync.get({
         minimumTrackDuration: 0,
         maximumTrackDuration: -1,
-        allowPlaylists: true
+        allowPlaylists: true,
+        allowReposts: true
     }, function (items) {
         document.getElementById('min_duration').value = items.minimumTrackDuration;
         document.getElementById('max_duration').value = items.maximumTrackDuration;
         document.getElementById('allow_playlists').checked = items.allowPlaylists;
+        document.getElementById('allow_reposts').checked = items.allowReposts;
     });
 }
+
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click',
         save_options);

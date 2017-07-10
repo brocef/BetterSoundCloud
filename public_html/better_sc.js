@@ -135,7 +135,12 @@ function parseSCItem(sc_item) {
     };
 
     var artist_a = sel("div.soundTitle__secondary > a.soundTitle__username");
-    var reposter_a = sel("div.soundTitle__secondary > div.soundTitle__info > a.actorUser, div.activity > div.streamContext > div.soundContext > span.soundContext__line > a:first-child");
+    
+    var poster_parent = sel("div.soundTitle__secondary > div.soundTitle__info, div.activity > div.streamContext > div.soundContext > span.soundContext__line");
+    var poster_a = poster_parent.querySelector("a:first-child");
+    var is_repost = poster_parent.querySelector("span.soundContext__repost") !== null;
+    
+    
     var track_a = sel("div.soundTitle__titleContainer > div > a.soundTitle__title");
     var post_time = sel("div.soundTitle__titleContainer > div.soundTitle__additionalContainer > div.soundTitle__uploadTime > time, div.activity > div.streamContext > div.soundContext > span.soundContext__line time");
     var tags_a = sel("div.soundTitle__titleContainer > div.soundTitle__additionalContainer > div.soundTitle__tagContainer > a.soundTitle__tag");
@@ -153,9 +158,9 @@ function parseSCItem(sc_item) {
         link: artist_a.href
     };
 
-    var reposter = {
-        name: reposter_a.textContent.trim(),
-        link: reposter_a.href
+    var poster = {
+        name: poster_a.textContent.trim(),
+        link: poster_a.href
     };
 
     var track = {
@@ -212,7 +217,7 @@ function parseSCItem(sc_item) {
         dom: {
             sc_item: sc_item,
             artist_a: artist_a,
-            reposter_a: reposter_a,
+            poster_a: poster_a,
             track_a: track_a,
             post_time: post_time,
             tags_a: tags_a,
@@ -225,7 +230,7 @@ function parseSCItem(sc_item) {
         },
         values: {
             artist: artist,
-            reposer: reposter,
+            poster: poster,
             track: track,
             post_time: timestamp,
             tags: tags,
@@ -236,7 +241,8 @@ function parseSCItem(sc_item) {
             comments: comments,
             duration: duration
         },
-        playlist: is_playlist
+        playlist: is_playlist,
+        is_repost: is_repost
     };
 }
 
@@ -283,6 +289,13 @@ function mkHideShowClickListener(sc_item_div) {
     };
 }
 
+function filter_repost(sc_obj, cfg) {
+    if (!cfg.allowReposts && sc_obj.is_repost) {
+        return sc_obj.values.track.name + " was filtered out because it is a repost";
+    }
+    return false;
+}
+
 function filter_playlist(sc_obj, cfg) {
     if (!cfg.allowPlaylists && sc_obj.playlist) {
         return sc_obj.values.track.name + " was filtered out because it is a playlist";
@@ -301,6 +314,7 @@ function filter_trackDuration(sc_obj, cfg) {
 }
 
 var filters = [
+    filter_repost,
     filter_playlist,
     filter_trackDuration
 ];
