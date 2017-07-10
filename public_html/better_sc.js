@@ -1,3 +1,19 @@
+/* 
+ * Copyright (C) 2017 Brian Cefali
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 /* global chrome */
 
 /**
@@ -135,12 +151,12 @@ function parseSCItem(sc_item) {
     };
 
     var artist_a = sel("div.soundTitle__secondary > a.soundTitle__username");
-    
+
     var poster_parent = sel("div.soundTitle__secondary > div.soundTitle__info, div.activity > div.streamContext > div.soundContext > span.soundContext__line");
     var poster_a = poster_parent.querySelector("a:first-child");
     var is_repost = poster_parent.querySelector("span.soundContext__repost") !== null;
-    
-    
+
+
     var track_a = sel("div.soundTitle__titleContainer > div > a.soundTitle__title");
     var post_time = sel("div.soundTitle__titleContainer > div.soundTitle__additionalContainer > div.soundTitle__uploadTime > time, div.activity > div.streamContext > div.soundContext > span.soundContext__line time");
     var tags_a = sel("div.soundTitle__titleContainer > div.soundTitle__additionalContainer > div.soundTitle__tagContainer > a.soundTitle__tag");
@@ -334,7 +350,8 @@ function init() {
     chrome.storage.sync.get({
         minimumTrackDuration: 0,
         maximumTrackDuration: -1,
-        allowPlaylists: false
+        allowPlaylists: true,
+        allowReposts: true
     }, function (cfg) {
         var loopCond = function () {
             return getTargetList() && document.querySelector("canvas.bscInitialized");
