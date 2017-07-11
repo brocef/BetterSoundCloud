@@ -21,7 +21,7 @@ By default, only promoted posts are filtered, but BSC can be easily configured t
 
 * **Brian Cefali** - *Initial work* - [Brocef](https://github.com/brocef)
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/brocef/BetterSoundCloud/contributors) who participated in this project.
 
 ## License
 
