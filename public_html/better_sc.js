@@ -156,6 +156,7 @@ function parseSCItem(sc_item) {
     var poster_a = poster_parent.querySelector("a:first-child");
     var is_repost = poster_parent.querySelector("span.soundContext__repost") !== null;
 
+    var is_promoted = sel("span.sc-promoted-icon") !== null;
 
     var track_a = sel("div.soundTitle__titleContainer > div > a.soundTitle__title");
     var post_time = sel("div.soundTitle__titleContainer > div.soundTitle__additionalContainer > div.soundTitle__uploadTime > time, div.activity > div.streamContext > div.soundContext > span.soundContext__line time");
@@ -258,7 +259,8 @@ function parseSCItem(sc_item) {
             duration: duration
         },
         playlist: is_playlist,
-        is_repost: is_repost
+        is_repost: is_repost,
+        is_promoted: is_promoted
     };
 }
 
@@ -305,6 +307,13 @@ function mkHideShowClickListener(sc_item_div) {
     };
 }
 
+function filter_promoted(sc_obj, cfg) {
+    if (!cfg.allowPromoted && sc_obj.is_promoted) {
+        return sc_obj.values.track.name + " was filtered out because it is a promoted track";
+    }
+    return false;
+}
+
 function filter_repost(sc_obj, cfg) {
     if (!cfg.allowReposts && sc_obj.is_repost) {
         return sc_obj.values.track.name + " was filtered out because it is a repost";
@@ -321,9 +330,9 @@ function filter_playlist(sc_obj, cfg) {
 
 function filter_trackDuration(sc_obj, cfg) {
     var sc_dur = sc_obj.values.duration.duration;
-    if (cfg.minimumTrackDuration > 0 && sc_dur < cfg.minimumTrackDuration) {
+    if (cfg.minimumTrackDuration.as_int > 0 && sc_dur < cfg.minimumTrackDuration.as_int) {
         return sc_obj.values.track.name + " was filtered out because it is too short";
-    } else if (cfg.maximumTrackDuration > 0 && sc_dur > cfg.maximumTrackDuration) {
+    } else if (cfg.maximumTrackDuration.as_int > 0 && sc_dur > cfg.maximumTrackDuration.as_int) {
         return sc_obj.values.track.name + " was filtered out because it is too long";
     }
     return false;
@@ -348,10 +357,17 @@ function getTargetList() {
 
 function init() {
     chrome.storage.sync.get({
-        minimumTrackDuration: 0,
-        maximumTrackDuration: -1,
+        minimumTrackDuration: {
+            as_str: "00:00",
+            as_int: 0
+        },
+        maximumTrackDuration: {
+            as_str: "2:00:00",
+            as_int: 3600 * 2
+        },
         allowPlaylists: true,
-        allowReposts: true
+        allowReposts: true,
+        allowPromoted: false
     }, function (cfg) {
         var loopCond = function () {
             return getTargetList() && document.querySelector("canvas.bscInitialized");
@@ -390,7 +406,7 @@ function init() {
 }
 
 var init_script = document.createElement("script");
-init_script.src = "chrome-extension://" + chrome.runtime.id + "/bsc_injected.js";
+init_script.src = chrome.runtime.getURL('/bsc_injected.js');
 
 function loopInject(condition_fn, body_fn, timeout) {
     var lerp = function () {

@@ -11,6 +11,12 @@ Google Chrome and access to the Chrome web store.
 Install the extension from [here](https://chrome.google.com/webstore/detail/better-soundcloud/nkeeogkohgghdbcjjjohielkpijpcpad).
 
 
+### Usage Instructions
+
+Simply right click the BSC icon to the right of the URL field and configure BSC settings through the "options" menu item.
+
+By default, only promoted posts are filtered, but BSC can be easily configured to filter based on a custom set of criteria in that page.
+
 ## Authors
 
 * **Brian Cefali** - *Initial work* - [Brocef](https://github.com/brocef)
@@ -23,5 +29,5 @@ This project is licensed under the GNU 3 License - see the [LICENSE.md](LICENSE.
 
 ## Acknowledgments
 
-* Luke A. for help with silly JavaScript "features"
-* Shane L. for help with early testing
+* Luke for help with silly JavaScript "features"
+* Shane, Alexis for help with early testing

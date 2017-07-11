@@ -23,24 +23,28 @@ function setStatus(status_msg, type) {
         status_span.classList.add("bsc_error");
     } else if (type === "info") {
         status_span.classList.add("bsc_info");
-    } else if (type === "warning") {
+    } else if (type === "warn") {
         status_span.classList.add("bsc_warning");
     }
     status_span.innerHTML = status_msg;
-    setTimeout(function () {
-        status_span.classList.add("bsc_hidden");
-    }, 3000);
 }
 
 function save_options() {
-    var min_duration = document.getElementById('min_duration').value;
-    var max_duration = document.getElementById('max_duration').value;
+    var min_duration_str = document.getElementById('min_duration').value;
+    var max_duration_str = document.getElementById('max_duration').value;
     var allow_playlists = document.getElementById('allow_playlists').checked;
     var allow_reposts = document.getElementById('allow_reposts').checked;
 
     chrome.storage.sync.set({
-        minimumTrackDuration: min_duration,
-        maximumTrackDuration: max_duration,
+        last_version: DEFAULT_OPTIONS.last_version,
+        minimumTrackDuration: {
+            as_str: min_duration_str,
+            as_int: convertTimeFieldToSeconds(min_duration_str)
+        },
+        maximumTrackDuration: {
+            as_str: max_duration_str,
+            as_int: convertTimeFieldToSeconds(max_duration_str)
+        },
         allowPlaylists: allow_playlists,
         allowReposts: allow_reposts
     }, function () {
@@ -48,20 +52,56 @@ function save_options() {
     });
 }
 
-function restore_options() {
-    chrome.storage.sync.get({
-        minimumTrackDuration: 0,
-        maximumTrackDuration: -1,
+var DEFAULT_OPTIONS = {
+        last_version: "1.0.11",
+        minimumTrackDuration: {
+            as_str: "00:00",
+            as_int: 0
+        },
+        maximumTrackDuration: {
+            as_str: "2:00:00",
+            as_int: 3600 * 2
+        },
         allowPlaylists: true,
-        allowReposts: true
-    }, function (items) {
-        document.getElementById('min_duration').value = items.minimumTrackDuration;
-        document.getElementById('max_duration').value = items.maximumTrackDuration;
+        allowReposts: true,
+        allowPromoted: false
+    };
+
+function restore_options() {
+    chrome.storage.sync.get(DEFAULT_OPTIONS, function (items) {
+        if (items.last_version !== DEFAULT_OPTIONS.last_version) {
+            items = DEFAULT_OPTIONS;
+            setStatus("BSC was updated... resetting options to defaults", "warn");
+        }
+        document.getElementById('min_duration').value = items.minimumTrackDuration.as_str;
+        document.getElementById('max_duration').value = items.maximumTrackDuration.as_str;
         document.getElementById('allow_playlists').checked = items.allowPlaylists;
         document.getElementById('allow_reposts').checked = items.allowReposts;
+        document.getElementById('allow_promoted').checked = items.allowPromoted;
     });
 }
 
+function convertTimeFieldToSeconds(time_str) {
+    var spl_time = time_str.split(":").reverse();
+    var time = 0;
+    var time_mod = [1, 60, 3600];
+    for (var i=0; i < spl_time.length && i < time_mod.length; i++) {
+        time += parseInt(spl_time[i]) * time_mod[i];
+    }
+    return time;
+}
+
+var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted'];
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click',
-        save_options);
+        function() {
+            var bad = false;
+            for (var i=0; i<input_ids.length; i++) {
+                if (!document.getElementById(input_ids[i]).checkValidity()) {
+                    bad = true;
+                }
+            }
+            if (!bad) {
+                save_options();
+            }
+        });

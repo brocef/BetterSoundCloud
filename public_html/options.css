@@ -29,7 +29,7 @@ html, body {
 #bsc_frame {
     min-width: 300px;
     width: 100%;
-    max-width: 600px;
+    max-width: 800px;
     height: auto;
     margin: 0 auto;
 }
@@ -69,6 +69,7 @@ html, body {
 
 .bsc_error {
     color: red;
+    font-weight: bold;
 }
 
 .bsc_info {
@@ -76,11 +77,18 @@ html, body {
 }
 
 .bsc_warning {
-    color: yellow;
+    color: red;
 }
 
 input {
     width: 100%;
+}
+
+.bsc_option {
+    display: block;
+    max-width: 140px;
+    margin: 0 auto;
+    text-align: center;
 }
 
 .bsc_options_table {
@@ -89,14 +97,26 @@ input {
     margin: 0 auto;
 }
 
-.bsc_options_table tr > td:nth-child(3) {
-    font-size: 9pt;
+.bsc_options_table tr > td {
+    padding: 0 10px 0 10px;
+}
+
+.bsc_options_table tr > td:nth-child(1) {
+    width: 25%;
+    text-align: right;
 }
 
 .bsc_options_table tr > td:nth-child(2) {
+    width: 40%;
     padding: 0 16px 0 0;
+    text-align: center;
 }
 
+.bsc_options_table tr > td:nth-child(3) {
+    width: 35%;
+    font-size: 9pt;
+    text-align: left;
+}
 
 .bsc_options_table th {
     background-color: #CFCFCF;
@@ -110,10 +130,9 @@ input {
     font-variant: normal;
     font-weight: 400;
     line-height: 22px;
-
     display: block;
     margin: 20px auto 0 auto;
     text-align: center;
     min-width: 100px;
+    width: 50%;
 }
-
