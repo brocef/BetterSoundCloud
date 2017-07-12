@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* global chrome */
+/* global chrome, DEFAULT_OPTIONS */
 
 /**
  * Ignore this function--its a fancy way to do something when the document is loaded and ready.
@@ -267,8 +267,9 @@ function parseSCItem(sc_item) {
 function processSCItem(sc_item, cfg) {
     var sc_obj = parseSCItem(sc_item);
 
-    for (var i = 0; i < filters.length; i++) {
-        var r = filters[i](sc_obj, cfg);
+    var filter_list = filter_hanndler.getFilterList();
+    for (var i = 0; i < filter_list.length; i++) {
+        var r = filter_list[i](sc_obj, cfg);
         if (!r) {
             continue;
         }
@@ -307,42 +308,54 @@ function mkHideShowClickListener(sc_item_div) {
     };
 }
 
-function filter_promoted(sc_obj, cfg) {
-    if (!cfg.allowPromoted && sc_obj.is_promoted) {
-        return sc_obj.values.track.name + " was filtered out because it is a promoted track";
-    }
-    return false;
-}
+var filter_hanndler = (function() {
+    var filters = {};
+    
+    filters.filter_promoted = function(sc_obj, cfg) {
+        if (!cfg.allowPromoted && sc_obj.is_promoted) {
+            return sc_obj.values.track.name + " was filtered out because it is a promoted track";
+        }
+        return false;
+    };
 
-function filter_repost(sc_obj, cfg) {
-    if (!cfg.allowReposts && sc_obj.is_repost) {
-        return sc_obj.values.track.name + " was filtered out because it is a repost";
-    }
-    return false;
-}
+    filters.filter_repost = function(sc_obj, cfg) {
+        if (!cfg.allowReposts && sc_obj.is_repost) {
+            return sc_obj.values.track.name + " was filtered out because it is a repost";
+        }
+        return false;
+    };
 
-function filter_playlist(sc_obj, cfg) {
-    if (!cfg.allowPlaylists && sc_obj.playlist) {
-        return sc_obj.values.track.name + " was filtered out because it is a playlist";
-    }
-    return false;
-}
+    filters.filter_playlist = function(sc_obj, cfg) {
+        if (!cfg.allowPlaylists && sc_obj.playlist) {
+            return sc_obj.values.track.name + " was filtered out because it is a playlist";
+        }
+        return false;
+    };
 
-function filter_trackDuration(sc_obj, cfg) {
-    var sc_dur = sc_obj.values.duration.duration;
-    if (cfg.minimumTrackDuration.as_int > 0 && sc_dur < cfg.minimumTrackDuration.as_int) {
-        return sc_obj.values.track.name + " was filtered out because it is too short";
-    } else if (cfg.maximumTrackDuration.as_int > 0 && sc_dur > cfg.maximumTrackDuration.as_int) {
-        return sc_obj.values.track.name + " was filtered out because it is too long";
-    }
-    return false;
-}
-
-var filters = [
-    filter_repost,
-    filter_playlist,
-    filter_trackDuration
-];
+    filters.filter_trackDuration = function(sc_obj, cfg) {
+        var sc_dur = sc_obj.values.duration.duration;
+        if (cfg.minimumTrackDuration.as_int > 0 && sc_dur < cfg.minimumTrackDuration.as_int) {
+            return sc_obj.values.track.name + " was filtered out because it is too short";
+        } else if (cfg.maximumTrackDuration.as_int > 0 && sc_dur > cfg.maximumTrackDuration.as_int) {
+            return sc_obj.values.track.name + " was filtered out because it is too long";
+        }
+        return false;
+    };
+    
+    filters.getFilterList = function() {
+        var filter_list = [];
+        var keys = Object.keys(filters);
+        for (var i=0; i<keys.length; i++) {
+            var k = keys[i];
+            if (k.startsWith("filter_")) {
+                filter_list.push(filters[k]);
+            }
+        }
+        return filter_list;
+    };
+    
+    return filters;
+})();
 
 function initialParse(cfg) {
     var sc_items = document.querySelectorAll("li.soundList__item");
@@ -356,19 +369,12 @@ function getTargetList() {
 }
 
 function init() {
-    chrome.storage.sync.get({
-        minimumTrackDuration: {
-            as_str: "00:00",
-            as_int: 0
-        },
-        maximumTrackDuration: {
-            as_str: "2:00:00",
-            as_int: 3600 * 2
-        },
-        allowPlaylists: true,
-        allowReposts: true,
-        allowPromoted: false
-    }, function (cfg) {
+    chrome.storage.sync.get(DEFAULT_OPTIONS, function (cfg) {
+        if (cfg.last_version !== DEFAULT_OPTIONS.last_version) {
+            cfg = DEFAULT_OPTIONS;
+            //TODO: Notify the user that the version changed and the settings were reste
+        }
+        
         var loopCond = function () {
             return getTargetList() && document.querySelector("canvas.bscInitialized");
         };

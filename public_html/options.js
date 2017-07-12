@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-/* global chrome */
+/* global chrome, DEFAULT_OPTIONS */
 
 function setStatus(status_msg, type) {
     var status_span = document.getElementById("status_span");
@@ -34,7 +34,8 @@ function save_options() {
     var max_duration_str = document.getElementById('max_duration').value;
     var allow_playlists = document.getElementById('allow_playlists').checked;
     var allow_reposts = document.getElementById('allow_reposts').checked;
-
+    var allow_promoted = document.getElementById('allow_promoted').checked;
+    
     chrome.storage.sync.set({
         last_version: DEFAULT_OPTIONS.last_version,
         minimumTrackDuration: {
@@ -46,26 +47,12 @@ function save_options() {
             as_int: convertTimeFieldToSeconds(max_duration_str)
         },
         allowPlaylists: allow_playlists,
-        allowReposts: allow_reposts
+        allowReposts: allow_reposts,
+        allowPromoted: allow_promoted
     }, function () {
         setStatus("Settings saved successfully", "info");
     });
 }
-
-var DEFAULT_OPTIONS = {
-        last_version: "1.0.11",
-        minimumTrackDuration: {
-            as_str: "00:00",
-            as_int: 0
-        },
-        maximumTrackDuration: {
-            as_str: "2:00:00",
-            as_int: 3600 * 2
-        },
-        allowPlaylists: true,
-        allowReposts: true,
-        allowPromoted: false
-    };
 
 function restore_options() {
     chrome.storage.sync.get(DEFAULT_OPTIONS, function (items) {

@@ -4,7 +4,7 @@
     "name": "Better SoundCloud",
     "short_name": "Better SoundCloud",
     "description": "An extension to make soundcloud better",
-    "version": "1.0.11",
+    "version": "1.0.12",
 
     "icons": {
         "16": "bsc16.png",
@@ -27,7 +27,7 @@
     "content_scripts": [{
             "matches": ["*://soundcloud.com/*"],
             "css": ["better_sc.css"],
-            "js": ["better_sc.js"],
+            "js": ["shared.js", "better_sc.js"],
             "run_at": "document_start"
         }],
 
