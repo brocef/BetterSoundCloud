@@ -27,5 +27,6 @@ var DEFAULT_OPTIONS = {
         },
         allowPlaylists: true,
         allowReposts: true,
-        allowPromoted: false
+        allowPromoted: false,
+		removeFiltered: false
     };

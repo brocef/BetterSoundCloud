@@ -274,24 +274,27 @@ function processSCItem(sc_item, cfg) {
             continue;
         }
         var sc_item_div = sc_item.querySelector("div");
+		sc_item_div.classList.add("filteredTrack");
 
-        var bsc_repl = document.createElement("div");
-        bsc_repl.classList.add("filteredLineDiv");
+		if (!cfg.removeFiltered) {
+			var bsc_repl = document.createElement("div");
+			bsc_repl.classList.add("filteredLineDiv");
 
-        var bsc_repl_p = document.createElement("p");
-        var bsc_repl_msg = document.createTextNode(r);
-        bsc_repl_p.appendChild(bsc_repl_msg);
+			var bsc_repl_p = document.createElement("p");
+			var bsc_repl_msg = document.createTextNode(r);
+			bsc_repl_p.appendChild(bsc_repl_msg);
 
-        var bsc_repl_show = document.createElement("span");
-        bsc_repl_show.textContent = "[show]";
-        bsc_repl_show.classList.add("bsc_show");
-        bsc_repl_p.appendChild(bsc_repl_show);
+			var bsc_repl_show = document.createElement("span");
+			bsc_repl_show.textContent = "[show]";
+			bsc_repl_show.classList.add("bsc_show");
+			bsc_repl_p.appendChild(bsc_repl_show);
 
-        sc_item_div.classList.add("filteredTrack");
-        bsc_repl_show.addEventListener("click", mkHideShowClickListener(sc_item_div));
+			
+			bsc_repl_show.addEventListener("click", mkHideShowClickListener(sc_item_div));
 
-        sc_item.insertBefore(bsc_repl_p, sc_item_div);
-
+			sc_item.insertBefore(bsc_repl_p, sc_item_div);
+		}
+		
         break;
     }
 }

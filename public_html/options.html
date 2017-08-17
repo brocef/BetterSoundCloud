@@ -40,10 +40,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <span class="bsc_centered_text bsc_hidden" id="status_span"></span>
             <table class="bsc_options_table">
                 <tr>
-                    <th colspan="3">Filtration Criteria</th>
-                </tr>
-
-                <tr>
                     <td><label for="min_duration">Minimum Song Duration</label></td>
                     <td><input class="bsc_option" id="min_duration" name="min_duration" type="text" placeholder="hh:mm:ss" 
                                pattern="^(([0-9]+:?[0-9]{2}:)|([0-9]+:))[0-9]{1,2}$" /></td>
@@ -69,6 +65,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <td><input type="checkbox" id="allow_promoted" name="allow_promoted" /></td>
                     <td>Promoted posts are examined like normal posts</td>
                 </tr>
+				<tr>
+					<td><label for="remove_filtered">Remove Filtered Posts</label></td>
+                    <td><input type="checkbox" id="remove_filtered" name="remove_filtered" /></td>
+                    <td>Filtered posts will be deleted instead of collapsed</td>
+				</tr>
 
                 <tr><td colspan="3">&nbsp;</td></tr>
 

@@ -35,6 +35,7 @@ function save_options() {
     var allow_playlists = document.getElementById('allow_playlists').checked;
     var allow_reposts = document.getElementById('allow_reposts').checked;
     var allow_promoted = document.getElementById('allow_promoted').checked;
+	var remove_filtered = document.getElementById('remove_filtered').checked;
     
     chrome.storage.sync.set({
         last_version: DEFAULT_OPTIONS.last_version,
@@ -48,7 +49,8 @@ function save_options() {
         },
         allowPlaylists: allow_playlists,
         allowReposts: allow_reposts,
-        allowPromoted: allow_promoted
+        allowPromoted: allow_promoted,
+		removeFiltered: remove_filtered
     }, function () {
         setStatus("Settings saved successfully", "info");
     });
@@ -65,6 +67,7 @@ function restore_options() {
         document.getElementById('allow_playlists').checked = items.allowPlaylists;
         document.getElementById('allow_reposts').checked = items.allowReposts;
         document.getElementById('allow_promoted').checked = items.allowPromoted;
+		document.getElementById('remove_filtered').checked = items.removeFiltered;
     });
 }
 
@@ -78,7 +81,7 @@ function convertTimeFieldToSeconds(time_str) {
     return time;
 }
 
-var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted'];
+var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted', 'remove_filtered'];
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('save').addEventListener('click',
         function() {

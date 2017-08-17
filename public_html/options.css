@@ -135,4 +135,5 @@ input {
     text-align: center;
     min-width: 100px;
     width: 50%;
+	max-width: 300px;
 }
