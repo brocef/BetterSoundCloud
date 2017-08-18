@@ -22,3 +22,6 @@ for (var i=0; i<opts_a.length; i++) {
     opts_a[i].href = options_url;
     opts_a[i].classList.remove('options_page_prelink');
 }
+
+var manifest = chrome.runtime.getManifest();
+document.getElementById("version").textContent = "v"+manifest.version;

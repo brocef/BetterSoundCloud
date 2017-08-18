@@ -98,7 +98,7 @@ input {
 }
 
 .bsc_options_table tr > td {
-    padding: 0 10px 0 10px;
+    padding: 10px 10px 0 10px;
 }
 
 .bsc_options_table tr > td:nth-child(1) {
