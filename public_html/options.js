@@ -32,7 +32,7 @@ function setStatus(status_msg, type) {
 	setTimeout(function() {
 		var cur_token = status_span.getAttribute('token');
 		if (cur_token == token) {
-			status_span.innerHTML = '';
+			status_span.innerHTML = '&nbsp;';
 		}
 	}, 3000);
 }
