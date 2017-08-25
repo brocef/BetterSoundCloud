@@ -60,6 +60,15 @@ html, body {
     line-height: 19.4px;
 }
 
+#bsc_frame table input, #bsc_frame table select, #bsc_frame table option, #bsc_frame button {
+    font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
+    font-size: 14px;
+    font-style: normal;
+    font-variant: normal;
+    font-weight: 400;
+    line-height: 20px;
+}
+
 .bsc_hidden {
     display: none;
 }
@@ -98,23 +107,33 @@ input {
     margin: 0 auto;
 }
 
+#preset_config_row td {
+	height: 30px;
+	vertical-align: middle;
+	padding: 0 0 20px 0 !important;
+}
+
+#preset_config_row select {
+	text-align-last: center;
+}
+
 .bsc_options_table tr > td {
     padding: 10px 10px 0 10px;
 }
 
 .bsc_options_table tr > td:nth-child(1) {
-    width: 25%;
+    /* width: 25%; */
     text-align: right;
 }
 
 .bsc_options_table tr > td:nth-child(2) {
-    width: 40%;
+    /* width: 40%; */
     padding: 0 16px 0 0;
     text-align: center;
 }
 
 .bsc_options_table tr > td:nth-child(3) {
-    width: 35%;
+    width: 45%;
     font-size: 9pt;
     text-align: left;
 }
@@ -126,14 +145,10 @@ input {
 
 #save {
     font-family: "Palatino Linotype", "Book Antiqua", Palatino, serif;
-    font-size: 18px;
-    font-style: normal;
-    font-variant: normal;
-    font-weight: 400;
-    line-height: 22px;
-    display: block;
-    margin: 20px auto 0 auto;
+    font-size: 18px !important;
     text-align: center;
+	display: block;
+    margin: 20px auto 0 auto;
     min-width: 100px;
     width: 50%;
 	max-width: 300px;

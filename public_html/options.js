@@ -27,6 +27,14 @@ function setStatus(status_msg, type) {
         status_span.classList.add("bsc_warning");
     }
     status_span.innerHTML = status_msg;
+	var token = Math.random();
+	status_span.setAttribute('token', token);
+	setTimeout(function() {
+		var cur_token = status_span.getAttribute('token');
+		if (cur_token == token) {
+			status_span.innerHTML = '';
+		}
+	}, 3000);
 }
 
 function save_options() {
@@ -62,13 +70,29 @@ function restore_options() {
             items = DEFAULT_OPTIONS;
             setStatus("BSC was updated... resetting options to defaults", "warn");
         }
-        document.getElementById('min_duration').value = items.minimumTrackDuration.as_str;
+        /* document.getElementById('min_duration').value = items.minimumTrackDuration.as_str;
         document.getElementById('max_duration').value = items.maximumTrackDuration.as_str;
         document.getElementById('allow_playlists').checked = items.allowPlaylists;
         document.getElementById('allow_reposts').checked = items.allowReposts;
         document.getElementById('allow_promoted').checked = items.allowPromoted;
-		document.getElementById('remove_filtered').checked = items.removeFiltered;
+		document.getElementById('remove_filtered').checked = items.removeFiltered; */
+		set_options(items);
     });
+}
+
+function set_options(opts) {
+	if ('minimumTrackDuration' in opts)
+		document.getElementById('min_duration').value = opts.minimumTrackDuration.as_str;
+	if ('maximumTrackDuration' in opts)
+		document.getElementById('max_duration').value = opts.maximumTrackDuration.as_str;
+	if ('allowPlaylists' in opts)
+		document.getElementById('allow_playlists').checked = opts.allowPlaylists;
+	if ('allowReposts' in opts)
+		document.getElementById('allow_reposts').checked = opts.allowReposts;
+	if ('allowPromoted' in opts)
+		document.getElementById('allow_promoted').checked = opts.allowPromoted;
+	if ('removeFiltered' in opts)
+		document.getElementById('remove_filtered').checked = opts.removeFiltered;
 }
 
 function convertTimeFieldToSeconds(time_str) {
@@ -82,8 +106,8 @@ function convertTimeFieldToSeconds(time_str) {
 }
 
 var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted', 'remove_filtered'];
-document.addEventListener('DOMContentLoaded', restore_options);
-document.getElementById('save').addEventListener('click',
+document.addEventListener('DOMContentLoaded', function() {
+	document.getElementById('save').addEventListener('click',
         function() {
             var bad = false;
             for (var i=0; i<input_ids.length; i++) {
@@ -95,3 +119,93 @@ document.getElementById('save').addEventListener('click',
                 save_options();
             }
         });
+	document.getElementById('config_select').value = '-';
+	document.getElementById('apply_preset_config_btn').addEventListener('click', function(evt) {
+		/*
+		<option value="all">Unfiltered</option>
+		<option value="mixes">Mixes</option>
+		<option value="playlists">Playlists</option>
+		<option value="noreposts">No Reposts</option>
+		
+		var DEFAULT_OPTIONS = {
+        last_version: "0.0.0",
+        minimumTrackDuration: {
+            as_str: "00:00",
+            as_int: 0
+        },
+        maximumTrackDuration: {
+            as_str: "2:00:00",
+            as_int: 3600 * 2
+        },
+        allowPlaylists: true,
+        allowReposts: true,
+        allowPromoted: false,
+		removeFiltered: false
+    };
+		*/
+		var sel_cfg = document.getElementById('config_select');
+		var sel_i = sel_cfg.selectedIndex;
+		if (sel_i != -1) {
+			var opts = {};
+			var val = sel_cfg.value;
+			if (val == 'all') {
+				opts['minimumTrackDuration'] = {
+					as_str: "00:00",
+					as_int: 0
+				};
+				opts['maximumTrackDuration'] = {
+					as_str: "2:00:00",
+					as_int: 3600 * 2
+				}
+				opts['allowPlaylist'] = true;
+				opts['allowReposts'] = true;
+				opts['allowPromoted'] = true;
+				opts['removeFiltered'] = false;
+			} else if(val == 'mixes') {
+				opts['minimumTrackDuration'] = {
+					as_str: "20:00",
+					as_int: 20 * 60
+				};
+				opts['maximumTrackDuration'] = {
+					as_str: "3:00:00",
+					as_int: 3 * 60 * 60
+				}
+				opts['allowPlaylist'] = false;
+				opts['allowReposts'] = true;
+				opts['allowPromoted'] = false;
+				opts['removeFiltered'] = true;
+			} else if(val == 'playlists') {
+				opts['minimumTrackDuration'] = {
+					as_str: "00:00",
+					as_int: 0
+				};
+				opts['maximumTrackDuration'] = {
+					as_str: "2:00:00",
+					as_int: 3600 * 2
+				}
+				opts['allowPlaylist'] = true;
+				opts['allowReposts'] = true;
+				opts['allowPromoted'] = false;
+				opts['removeFiltered'] = true;
+			} else if(val == 'noreposts') {
+				opts['minimumTrackDuration'] = {
+					as_str: "00:00",
+					as_int: 0
+				};
+				opts['maximumTrackDuration'] = {
+					as_str: "2:00:00",
+					as_int: 3600 * 2
+				}
+				opts['allowPlaylist'] = true;
+				opts['allowReposts'] = false;
+				opts['allowPromoted'] = false;
+				opts['removeFiltered'] = true;
+			}
+			set_options(opts);
+			setStatus("Preset Configuration Applied", "info")
+		}
+	});
+	if (chrome && chrome.storage && chrome.storage.sync) {
+		restore_options();
+	}
+});

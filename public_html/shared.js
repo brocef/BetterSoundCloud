@@ -16,7 +16,7 @@
  */
 
 var DEFAULT_OPTIONS = {
-        last_version: "1.0.11",
+        last_version: "0.0.0",
         minimumTrackDuration: {
             as_str: "00:00",
             as_int: 0
@@ -30,3 +30,8 @@ var DEFAULT_OPTIONS = {
         allowPromoted: false,
 		removeFiltered: false
     };
+
+if (chrome && chrome.runtime) {	
+	var manifest = chrome.runtime.getManifest();
+	DEFAULT_OPTIONS['last_version'] = manifest.version;
+}

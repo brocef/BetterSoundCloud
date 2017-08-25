@@ -39,6 +39,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             <span class="bsc_centered_text bsc_hidden" id="status_span"></span>
             <table class="bsc_options_table">
+				<tr id="preset_config_row">
+					<td><div>Preset Configurations</div></td>
+					<td>
+						<div>
+							<select id="config_select">
+								<option value="all">Unfiltered</option>
+								<option value="mixes">Mixes</option>
+								<option value="playlists">Playlists</option>
+								<option value="noreposts">No Reposts</option>
+							</select>
+						</div>
+					</td>
+					<td><div><button id="apply_preset_config_btn" type="button">Apply</button></div></td>
+				</tr>
                 <tr>
                     <td><label for="min_duration">Minimum Song Duration</label></td>
                     <td><input class="bsc_option" id="min_duration" name="min_duration" type="text" placeholder="hh:mm:ss" 
@@ -74,7 +88,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                 <tr><td colspan="3">&nbsp;</td></tr>
 
                 <tr>
-                    <td colspan="3"><input type="submit" id="save" value="Save" /></td>
+					<td>&nbsp;</td>
+                    <td><input type="submit" id="save" value="Save" /></td>
+					<td>&nbsp;</td>
                 </tr>
             </table>
 
