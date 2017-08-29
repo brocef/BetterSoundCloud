@@ -16,6 +16,10 @@
  */
 /* global chrome, DEFAULT_OPTIONS */
 
+var BSC = {
+	'filtered_tracks': 0
+};
+
 /**
  * Ignore this function--its a fancy way to do something when the document is loaded and ready.
  * Equivalent to jQuery's $.ready()
@@ -267,12 +271,14 @@ function parseSCItem(sc_item) {
 function processSCItem(sc_item, cfg) {
     var sc_obj = parseSCItem(sc_item);
 
-    var filter_list = filter_hanndler.getFilterList();
+    var filter_list = filter_handler.getFilterList();
     for (var i = 0; i < filter_list.length; i++) {
         var r = filter_list[i](sc_obj, cfg);
         if (!r) {
             continue;
         }
+		BSC['filtered_tracks'] += 1;
+		
         var sc_item_div = sc_item.querySelector("div");
 		sc_item_div.classList.add("filteredTrack");
 
@@ -295,6 +301,8 @@ function processSCItem(sc_item, cfg) {
 			sc_item.insertBefore(bsc_repl_p, sc_item_div);
 		}
 		
+		document.querySelector("#total_filtered_tracks").textContent = BSC['filtered_tracks'];
+		
         break;
     }
 }
@@ -311,7 +319,7 @@ function mkHideShowClickListener(sc_item_div) {
     };
 }
 
-var filter_hanndler = (function() {
+var filter_handler = (function() {
     var filters = {};
     
     filters.filter_promoted = function(sc_obj, cfg) {
@@ -375,7 +383,7 @@ function init() {
     chrome.storage.sync.get(DEFAULT_OPTIONS, function (cfg) {
         if (cfg.last_version !== DEFAULT_OPTIONS.last_version) {
             cfg = DEFAULT_OPTIONS;
-            //TODO: Notify the user that the version changed and the settings were reste
+            //TODO: Notify the user that the version changed and the settings were reset
         }
         
         var loopCond = function () {
@@ -402,7 +410,27 @@ function init() {
                 childList: true,
                 characterData: false
             };
-
+			
+			var bsc_info_li = document.createElement('li');
+			bsc_info_li.classList.add('bsc_info_area');
+			
+			var bsc_header = document.createElement('p');
+			bsc_header.textContent = 'BetterSoundCloud is running—refresh if BSC did not initialize';
+			bsc_info_li.appendChild(bsc_header);
+			
+			var bsc_info_p = document.createElement('p');
+			bsc_info_p.appendChild(document.createTextNode('Total Tracks Filtered: '));
+			
+			var total_filtered_tracks = document.createElement('span');
+			total_filtered_tracks.id = "total_filtered_tracks";
+			total_filtered_tracks.textContent = '0';
+			bsc_info_p.appendChild(total_filtered_tracks);
+			
+			bsc_info_li.appendChild(bsc_info_p);
+			
+			
+			target.insertBefore(bsc_info_li, target.childNodes[0]);
+			
             observer.observe(target, config);
 
             // observer.disconnect();

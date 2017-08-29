@@ -4,7 +4,7 @@
     "name": "Better SoundCloud",
     "short_name": "Better SoundCloud",
     "description": "An extension to make soundcloud better",
-    "version": "1.0.17",
+    "version": "1.0.18",
 
     "icons": {
         "16": "bsc16.png",

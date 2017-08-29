@@ -2,10 +2,7 @@
 
 CanvasRenderingContext2D.prototype.fillTextOrig = CanvasRenderingContext2D.prototype.fillText;
 CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxwidth) {
-    /*
-     console.log("Drawing "+text+" at "+x+","+y);
-     console.log(this.canvas);
-     */
+	// We only need to add the duration if it isn't there already and if the text being drawn is a time
     if (!this.canvas.hasAttribute("duration") && text.match(/^(\d+:)?\d+:\d+$/)) {
         this.canvas.setAttribute("duration", text);
         this.canvas.classList.add("bscInitialized");
