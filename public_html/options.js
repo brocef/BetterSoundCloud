@@ -121,28 +121,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
 	document.getElementById('config_select').value = '-';
 	document.getElementById('apply_preset_config_btn').addEventListener('click', function(evt) {
-		/*
-		<option value="all">Unfiltered</option>
-		<option value="mixes">Mixes</option>
-		<option value="playlists">Playlists</option>
-		<option value="noreposts">No Reposts</option>
-		
-		var DEFAULT_OPTIONS = {
-        last_version: "0.0.0",
-        minimumTrackDuration: {
-            as_str: "00:00",
-            as_int: 0
-        },
-        maximumTrackDuration: {
-            as_str: "2:00:00",
-            as_int: 3600 * 2
-        },
-        allowPlaylists: true,
-        allowReposts: true,
-        allowPromoted: false,
-		removeFiltered: false
-    };
-		*/
 		var sel_cfg = document.getElementById('config_select');
 		var sel_i = sel_cfg.selectedIndex;
 		if (sel_i != -1) {
@@ -167,8 +145,8 @@ document.addEventListener('DOMContentLoaded', function() {
 					as_int: 20 * 60
 				};
 				opts['maximumTrackDuration'] = {
-					as_str: "3:00:00",
-					as_int: 3 * 60 * 60
+					as_str: "4:00:00",
+					as_int: 4 * 60 * 60
 				}
 				opts['allowPlaylist'] = false;
 				opts['allowReposts'] = true;

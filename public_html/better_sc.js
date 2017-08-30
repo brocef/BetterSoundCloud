@@ -16,9 +16,14 @@
  */
 /* global chrome, DEFAULT_OPTIONS */
 
-var BSC = {
-	'filtered_tracks': 0
-};
+var BSC = {};
+initBSC();
+
+function initBSC() {
+	BSC = {
+		'filtered_tracks': 0
+	};
+}
 
 /**
  * Ignore this function--its a fancy way to do something when the document is loaded and ready.
@@ -135,18 +140,14 @@ function parseFancyNumber(num) {
 }
 
 function processSCItemWhenLoaded(sc_item, cfg) {
-    var getDurCanvas = function () {
+    var loopCond = function () {
         return sc_item.querySelector("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscInitialized");
     };
-    var waitForCanvas = function () {
-        if (getDurCanvas())
-        {
-            processSCItem(sc_item, cfg);
-            return 0;
-        }
-        setTimeout(waitForCanvas, 5); // 5 ms
+    var loopBody = function () {
+        processSCItem(sc_item, cfg);
     };
-    return waitForCanvas();
+	
+	loopInject(loopCond, loopBody, 5);
 }
 
 function parseSCItem(sc_item) {
@@ -227,6 +228,10 @@ function parseSCItem(sc_item) {
         var comments = -1;
     }
 
+	if (!duration_canvas.hasAttribute("duration")) {
+		console.log("SoundCloud item did not initialize correctly!");
+		return null;
+	}
     var dur_raw = duration_canvas.getAttribute("duration").trim();
     var dur = parseTimeString(dur_raw);
     var duration = {
@@ -269,6 +274,8 @@ function parseSCItem(sc_item) {
 }
 
 function processSCItem(sc_item, cfg) {
+	if (sc_item.hasAttribute("bscVisited")) return;
+	sc_item.setAttribute("bscVisited", "true");
     var sc_obj = parseSCItem(sc_item);
 
     var filter_list = filter_handler.getFilterList();
@@ -369,10 +376,21 @@ var filter_handler = (function() {
 })();
 
 function initialParse(cfg) {
-    var sc_items = document.querySelectorAll("li.soundList__item");
-    for (var i = 0; i < sc_items.length; i++) {
-        processSCItem(sc_items[i], cfg);
-    }
+	var loopCond = function() {
+		var sc_items = document.querySelectorAll("li.soundList__item");
+		var bsc_init_items = document.querySelectorAll(".bscInitialized");
+		return sc_items.length == bsc_init_items.length;
+	};
+	
+	var loopBody = function() {
+		var sc_items = document.querySelectorAll("li.soundList__item");
+		var bsc_init_items = document.querySelectorAll(".bscInitialized");
+		for (var i = 0; i < sc_items.length; i++) {
+			processSCItem(sc_items[i], cfg);
+		}
+	};
+	
+	loopInject(loopCond, loopBody, 5);
 }
 
 function getTargetList() {
@@ -386,8 +404,15 @@ function init() {
             //TODO: Notify the user that the version changed and the settings were reset
         }
         
+		var orig_pathname = window.location.pathname;
+		
+		// If the page we're on is not the page init() was called on, then bail
+		var loopTerm = function() {
+			return window.location.pathname != orig_pathname;
+		};
+		
         var loopCond = function () {
-            return getTargetList() && document.querySelector("canvas.bscInitialized");
+            return getTargetList();// && document.querySelector("canvas.bscInitialized");
         };
 
         var loopBody = function () {
@@ -414,8 +439,13 @@ function init() {
 			var bsc_info_li = document.createElement('li');
 			bsc_info_li.classList.add('bsc_info_area');
 			
+			
+			var ver = '?';
+			if (chrome) {
+				ver = chrome.runtime.getManifest().version;
+			}
 			var bsc_header = document.createElement('p');
-			bsc_header.textContent = 'BetterSoundCloud is running—refresh if BSC did not initialize';
+			bsc_header.textContent = 'BetterSoundCloud v' + ver + ' is running';
 			bsc_info_li.appendChild(bsc_header);
 			
 			var bsc_info_p = document.createElement('p');
@@ -437,8 +467,8 @@ function init() {
 
             initialParse(cfg);
         };
-
-        loopInject(loopCond, loopBody, 5);
+		
+        loopInjectWithLimit(loopCond, loopBody, 5, loopTerm);
     });
 }
 
@@ -446,15 +476,20 @@ var init_script = document.createElement("script");
 init_script.src = chrome.runtime.getURL('/bsc_injected.js');
 
 function loopInject(condition_fn, body_fn, timeout) {
-    var lerp = function () {
-        if (condition_fn())
-        {
+	return loopInjectWithLimit(condition_fn, body_fn, timeout, function() {return false;});
+}
+
+function loopInjectWithLimit(condition_fn, body_fn, timeout, kill_fn) {
+    var lerp = function (tries) {
+        if (kill_fn()) {
+			return;
+		} else if (condition_fn()) {
             body_fn();
-            return 0;
-        }
-        setTimeout(lerp, timeout);
+        } else {
+			setTimeout(lerp, timeout, kill_fn);
+		}
     };
-    lerp();
+    lerp(kill_fn);
 }
 
 loopInject(
@@ -477,13 +512,19 @@ docReady(function () {
             function () {
                 var content = document.querySelector("#content");
                 var content_obs = new MutationObserver(function (mutations) {
+					var nodesWereRemoved = false;
                     for (var i = 0; i < mutations.length; i++) {
                         if (mutations[i].removedNodes.length > 0) {
-                            init();
-                            return;
+							nodesWereRemoved = true;
+							break;
                         }
                     }
+					if (nodesWereRemoved) {
+						initBSC();
+						init();
+					}
                 });
+				
                 content_obs.observe(content, {
                     childList: true,
                     attributes: false,
