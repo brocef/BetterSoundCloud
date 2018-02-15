@@ -306,6 +306,8 @@ function processSCItem(sc_item, cfg) {
 			bsc_repl_show.addEventListener("click", mkHideShowClickListener(sc_item_div));
 
 			sc_item.insertBefore(bsc_repl_p, sc_item_div);
+		} else {
+			sc_item_div.parentElement.parentElement.removeChild(sc_item_div.parentElement);
 		}
 		
 		document.querySelector("#total_filtered_tracks").textContent = BSC['filtered_tracks'];
@@ -384,7 +386,6 @@ function initialParse(cfg) {
 	
 	var loopBody = function() {
 		var sc_items = document.querySelectorAll("li.soundList__item");
-		var bsc_init_items = document.querySelectorAll(".bscInitialized");
 		for (var i = 0; i < sc_items.length; i++) {
 			processSCItem(sc_items[i], cfg);
 		}
@@ -423,10 +424,10 @@ function init() {
                     var new_nodes = mutation.addedNodes;
                     if (new_nodes.length !== 1) {
                         console.log("Warning! Unexpected number of new children in single mutation");
-                    }
-                    var sc_item = new_nodes.item(0);
-
-                    processSCItemWhenLoaded(sc_item, cfg);
+                    } else {
+						var sc_item = new_nodes.item(0);
+						processSCItemWhenLoaded(sc_item, cfg);
+					}
                 });
             });
 
@@ -439,14 +440,43 @@ function init() {
 			var bsc_info_li = document.createElement('li');
 			bsc_info_li.classList.add('bsc_info_area');
 			
-			
+			var bsc_info_table = document.createElement('table');
+            bsc_info_table.style = 'width: 100%;';
+            
+            var bsc_info_table_row = document.createElement('tr');
+            var bsc_info_td = document.createElement('td');
+            var bsc_help_td = document.createElement('td');
+            bsc_info_td.style = 'vertical-align: top;';
+            
+            bsc_help_td.style = "vertical-align: top; text-align: right;";
+            
+            bsc_info_li.appendChild(bsc_info_table);
+            bsc_info_table.appendChild(bsc_info_table_row);
+            bsc_info_table_row.appendChild(bsc_info_td);
+            bsc_info_table_row.appendChild(bsc_help_td);
+            
+            var bsc_help_p = document.createElement('p');
+            bsc_help_p.textContent = 'Not working? Try scrolling to the bottom or refreshing.';
+            
+            var bsc_help_p2 = document.createElement('p');
+            bsc_help_p2.textContent = 'If all else fails, report a bug ';
+            
+            var bsc_help_a = document.createElement('a');
+            bsc_help_a.href = 'https://github.com/brocef/BetterSoundCloud/issues';
+            bsc_help_a.textContent = 'here';
+            bsc_help_a.target = '_blank';
+            
+            bsc_help_td.appendChild(bsc_help_p);
+            bsc_help_td.appendChild(bsc_help_p2);
+            bsc_help_p2.appendChild(bsc_help_a);
+            
 			var ver = '?';
 			if (chrome) {
 				ver = chrome.runtime.getManifest().version;
 			}
 			var bsc_header = document.createElement('p');
 			bsc_header.textContent = 'BetterSoundCloud v' + ver + ' is running';
-			bsc_info_li.appendChild(bsc_header);
+			bsc_info_td.appendChild(bsc_header);
 			
 			var bsc_info_p = document.createElement('p');
 			bsc_info_p.appendChild(document.createTextNode('Total Tracks Filtered: '));
@@ -456,7 +486,7 @@ function init() {
 			total_filtered_tracks.textContent = '0';
 			bsc_info_p.appendChild(total_filtered_tracks);
 			
-			bsc_info_li.appendChild(bsc_info_p);
+			bsc_info_td.appendChild(bsc_info_p);
 			
 			
 			target.insertBefore(bsc_info_li, target.childNodes[0]);
