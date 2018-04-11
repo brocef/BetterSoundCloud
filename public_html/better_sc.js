@@ -171,7 +171,7 @@ function parseSCItem(sc_item) {
     var dl_a = sel("div.sound__footer > div.sound__soundActions a.soundActions__purchaseLink");
     var plays_span = sel("div.sound__footer > div.sound__footerRight div.sound__soundStats li:nth-child(1) > span > span:nth-child(2)");
     var comments_li = sel("div.sound__footer > div.sound__footerRight div.sound__soundStats li:nth-child(2) > a > span:nth-child(2)");
-    var duration_canvas = sel("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscInitialized");
+    var duration_canvas = sel("div.sound__waveform div.waveform > div.waveform__layer > canvas.bscProcessed");
 
     var is_playlist = sel("div > div.playlist") !== null;
 
@@ -179,11 +179,19 @@ function parseSCItem(sc_item) {
         name: artist_a.textContent.trim(),
         link: artist_a.href
     };
-
-    var poster = {
-        name: poster_a.textContent.trim(),
-        link: poster_a.href
-    };
+    
+    var poster;
+    if (is_promoted) {
+        poster = {
+            name: null,
+            link: null
+        };
+    } else {
+        poster = {
+            name: poster_a.textContent.trim(),
+            link: poster_a.href
+        };
+    }
 
     var track = {
         name: track_a.textContent.trim(),
@@ -274,8 +282,17 @@ function parseSCItem(sc_item) {
 }
 
 function processSCItem(sc_item, cfg) {
+    var canvas = sc_item.querySelector('.bscInitialized');
+    canvas.classList.remove('bscInitialized');
+    canvas.classList.add('bscProcessed');
+    
 	if (sc_item.hasAttribute("bscVisited")) return;
 	sc_item.setAttribute("bscVisited", "true");
+    
+    if (cfg['onlyFilterStream'] && window.location.pathname != "/stream") {
+        return;
+    }
+    
     var sc_obj = parseSCItem(sc_item);
 
     var filter_list = filter_handler.getFilterList();
@@ -379,16 +396,18 @@ var filter_handler = (function() {
 
 function initialParse(cfg) {
 	var loopCond = function() {
-		var sc_items = document.querySelectorAll("li.soundList__item");
 		var bsc_init_items = document.querySelectorAll(".bscInitialized");
-		return sc_items.length == bsc_init_items.length;
+		return bsc_init_items.length > 0;
 	};
 	
 	var loopBody = function() {
 		var sc_items = document.querySelectorAll("li.soundList__item");
 		for (var i = 0; i < sc_items.length; i++) {
-			processSCItem(sc_items[i], cfg);
+            if (sc_items[i].querySelector(".bscInitialized")) {
+                processSCItem(sc_items[i], cfg);
+            }
 		}
+        initialParse(cfg);
 	};
 	
 	loopInject(loopCond, loopBody, 5);
@@ -422,12 +441,14 @@ function init() {
             var observer = new MutationObserver(function (mutations) {
                 mutations.forEach(function (mutation) {
                     var new_nodes = mutation.addedNodes;
-                    if (new_nodes.length !== 1) {
-                        console.log("Warning! Unexpected number of new children in single mutation");
-                    } else {
-						var sc_item = new_nodes.item(0);
-						processSCItemWhenLoaded(sc_item, cfg);
-					}
+                    for (var i=0; i<new_nodes.length; i++) {
+                        var sc_item = new_nodes.item(i);
+                        if (sc_item.tagName.toLowerCase() == "li" && sc_item.classList.contains("soundList__item")) {
+                            processSCItemWhenLoaded(sc_item, cfg);
+                        } else {
+                            console.log("Unexpected child type of the sounds UL list");
+                        }
+                    }
                 });
             });
 
@@ -510,7 +531,7 @@ function loopInject(condition_fn, body_fn, timeout) {
 }
 
 function loopInjectWithLimit(condition_fn, body_fn, timeout, kill_fn) {
-    var lerp = function (tries) {
+    var lerp = function () {
         if (kill_fn()) {
 			return;
 		} else if (condition_fn()) {
@@ -519,7 +540,7 @@ function loopInjectWithLimit(condition_fn, body_fn, timeout, kill_fn) {
 			setTimeout(lerp, timeout, kill_fn);
 		}
     };
-    lerp(kill_fn);
+    lerp();
 }
 
 loopInject(

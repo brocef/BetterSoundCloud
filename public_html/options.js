@@ -44,6 +44,7 @@ function save_options() {
     var allow_reposts = document.getElementById('allow_reposts').checked;
     var allow_promoted = document.getElementById('allow_promoted').checked;
 	var remove_filtered = document.getElementById('remove_filtered').checked;
+    var only_filter_stream = document.getElementById('only_filter_stream').checked;
     
     chrome.storage.sync.set({
         last_version: DEFAULT_OPTIONS.last_version,
@@ -58,9 +59,10 @@ function save_options() {
         allowPlaylists: allow_playlists,
         allowReposts: allow_reposts,
         allowPromoted: allow_promoted,
-		removeFiltered: remove_filtered
+		removeFiltered: remove_filtered,
+        onlyFilterStream: only_filter_stream
     }, function () {
-        setStatus("Settings saved successfully", "info");
+        setStatus("New BSC configuration was applied. Refresh any SoundCloud tabs now.", "info");
     });
 }
 
@@ -93,6 +95,8 @@ function set_options(opts) {
 		document.getElementById('allow_promoted').checked = opts.allowPromoted;
 	if ('removeFiltered' in opts)
 		document.getElementById('remove_filtered').checked = opts.removeFiltered;
+    if ('onlyFilterStream' in opts)
+        document.getElementById('only_filter_stream').checked = opts.onlyFilterStream;
 }
 
 function convertTimeFieldToSeconds(time_str) {
@@ -105,7 +109,7 @@ function convertTimeFieldToSeconds(time_str) {
     return time;
 }
 
-var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted', 'remove_filtered'];
+var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted', 'remove_filtered', 'only_filter_stream'];
 document.addEventListener('DOMContentLoaded', function() {
 	document.getElementById('save').addEventListener('click',
         function() {
@@ -139,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				opts['allowReposts'] = true;
 				opts['allowPromoted'] = true;
 				opts['removeFiltered'] = false;
+                opts['onlyFilterStream'] = false;
 			} else if(val == 'mixes') {
 				opts['minimumTrackDuration'] = {
 					as_str: "20:00",
@@ -152,6 +157,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				opts['allowReposts'] = true;
 				opts['allowPromoted'] = false;
 				opts['removeFiltered'] = true;
+                opts['onlyFilterStream'] = false;
 			} else if(val == 'playlists') {
 				opts['minimumTrackDuration'] = {
 					as_str: "00:00",
@@ -165,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				opts['allowReposts'] = true;
 				opts['allowPromoted'] = false;
 				opts['removeFiltered'] = true;
+                opts['onlyFilterStream'] = false;
 			} else if(val == 'noreposts') {
 				opts['minimumTrackDuration'] = {
 					as_str: "00:00",
@@ -178,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
 				opts['allowReposts'] = false;
 				opts['allowPromoted'] = false;
 				opts['removeFiltered'] = true;
+                opts['onlyFilterStream'] = false;
 			}
 			set_options(opts);
 			setStatus("Preset Configuration Applied", "info")

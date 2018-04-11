@@ -28,7 +28,8 @@ var DEFAULT_OPTIONS = {
         allowPlaylists: true,
         allowReposts: true,
         allowPromoted: false,
-		removeFiltered: false
+		removeFiltered: false,
+        onlyFilterStream: false
     };
 
 if (chrome && chrome.runtime) {	

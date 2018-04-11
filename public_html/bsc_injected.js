@@ -9,8 +9,3 @@ CanvasRenderingContext2D.prototype.fillText = function (text, x, y, maxwidth) {
     }
     this.fillTextOrig(text, x, y, maxwidth);
 };
-
-History.prototype.pushStateOrig = History.prototype.pushState;
-History.prototype.pushState = function (state, title, url) {
-	this.pushStateOrig(state, title, url);
-};
