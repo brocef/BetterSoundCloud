@@ -158,9 +158,19 @@ function parseSCItem(sc_item) {
     var artist_a = sel("div.soundTitle__secondary > a.soundTitle__username");
 
     var poster_parent = sel("div.soundTitle__secondary > div.soundTitle__info, div.activity > div.streamContext > div.soundContext > span.soundContext__line");
-    var poster_a = poster_parent.querySelector("a:first-child");
-    var is_repost = poster_parent.querySelector("span.soundContext__repost") !== null;
-
+	
+	var poster_a;
+	var is_repost;
+	
+	// If poster_parent is null, then we are on an artist's page and the track is posted by the artist
+	if (poster_parent == null) {
+		poster_a = artist_a;
+		is_repost = false;
+	} else {
+		var poster_a = poster_parent.querySelector("a:first-child");
+		var is_repost = poster_parent.querySelector("span.soundContext__repost") !== null;
+	}
+	
     var is_promoted = sel("span.sc-promoted-icon") !== null;
 
     var track_a = sel("div.soundTitle__titleContainer > div > a.soundTitle__title");
@@ -551,6 +561,33 @@ loopInject(
             document.head.appendChild(init_script);
         }, 5);
 
+/*
+These two observers monitor changes to the page
+
+When navigating from your /stream page to a user profile, the content_obs detects the change. HOWEVER, when navigating from some user page to
+another user's page, the content_obs mutation observer will NOT detect the change, since #content doesn't see the change. Instead, an additional
+observer is used, one which observes the parent of .userMain, and this observer will see the change between profiles.
+
+There is, however, one issue with that architecture. If the user navigates from /stream to a profile, possibly navigates between one or more profiles,
+then goes back to /stream, the user_stream_obs will now be observing a DOM element which was removed. Therefore, the observer should be disconnected
+and a new one should be constructed when the .userMain parent exists again (after the user navigates to a profile page again).
+
+To do this, the two observers are global variables which will also represent the state of the extension. If user_stream_obs is not null, and the user is
+on /stream, then user_stream_obs should be disconnected and set to null. If the user navigates to a user page and user_stream_obs is null, then a new 
+mutation observer should be constructed.
+*/
+content_obs = null;
+user_stream_obs = null;
+
+// Detects the state: NOT on /stream, ON a user profile
+var get_user_stream = function() {
+	return document.querySelector("#content > div > div.l-fluid-fixed > div.l-main.l-user-main.sc-border-light-right");
+};
+
+// Detects the state: ON /stream, NOT on a user profile
+var get_stream = function() {
+	return document.querySelector(".stream");
+};
 /**
  * First time init
  * @returns {undefined}
@@ -558,11 +595,16 @@ loopInject(
 docReady(function () {
     loopInject(
             function () {
-                return document.querySelector("#content");
+                return get_user_stream() != null || get_stream() != null;
             },
             function () {
+				if (get_user_stream() != null && get_stream() != null) {
+					console.log("Invalid state! Unknown behavior!");
+				}
+				
                 var content = document.querySelector("#content");
-                var content_obs = new MutationObserver(function (mutations) {
+				
+				var content_obs_callback = function (mutations) {
 					var nodesWereRemoved = false;
                     for (var i = 0; i < mutations.length; i++) {
                         if (mutations[i].removedNodes.length > 0) {
@@ -570,17 +612,50 @@ docReady(function () {
 							break;
                         }
                     }
-					if (nodesWereRemoved) {
+					return nodesWereRemoved;
+                };
+				
+				var init_user_stream_obs = function() {
+					var user_stream = get_user_stream();
+					if (user_stream != null) {
+						// We are on a user stream page
+						user_stream_obs = new MutationObserver(function(mutations) {
+							if (content_obs_callback(mutations)) {
+								initBSC();
+								init();
+							}
+						});
+						
+						user_stream_obs.observe(user_stream, {
+							childList: true,
+							attributes: false,
+							characterData: false
+						});
+					} else {
+						// We are on /stream
+						if (user_stream_obs != null) {
+							user_stream_obs.disconnect();
+							user_stream_obs = null;
+						}
+					}
+				};
+				
+                content_obs = new MutationObserver(function(mutations) {
+					if (content_obs_callback(mutations)) {
+						init_user_stream_obs();
+						
 						initBSC();
 						init();
 					}
-                });
+				});
+				
 				
                 content_obs.observe(content, {
                     childList: true,
                     attributes: false,
                     characterData: false
                 });
+				init_user_stream_obs();
                 init();
             }, 5);
 });
