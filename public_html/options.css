@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2017 Brian Cefali
+Copyright (C) 2018 Brian Cefali
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -90,11 +90,11 @@ html, body {
     color: red;
 }
 
-input {
+input, select {
     width: 100%;
 }
 
-.bsc_option {
+.bsc_option, select {
     display: block;
     max-width: 140px;
     margin: 0 auto;
@@ -110,7 +110,6 @@ input {
 #preset_config_row td {
 	height: 30px;
 	vertical-align: middle;
-	padding: 0 0 20px 0 !important;
 }
 
 #preset_config_row select {
@@ -118,7 +117,7 @@ input {
 }
 
 .bsc_options_table tr > td {
-    padding: 10px 10px 0 10px;
+    /* padding: 10px 10px 0 10px; */
 }
 
 .bsc_options_table tr > td:nth-child(1) {
@@ -128,7 +127,7 @@ input {
 
 .bsc_options_table tr > td:nth-child(2) {
     /* width: 40%; */
-    padding: 0 16px 0 0;
+    /* padding: 0 16px 0 0; */
     text-align: center;
 }
 
