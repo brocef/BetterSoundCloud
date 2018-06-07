@@ -45,7 +45,12 @@ function save_options() {
     var allow_promoted = document.getElementById('allow_promoted').checked;
 	var remove_filtered = document.getElementById('remove_filtered').checked;
     var only_filter_stream = document.getElementById('only_filter_stream').checked;
-    
+    var blocked_repost_users = {};
+	var blocked_repost_user_options = document.querySelectorAll('#blocked_users_select > option');
+	for (var i=0; i<blocked_repost_user_options.length; i++) {
+		var opt = blocked_repost_user_options[i];
+		blocked_repost_users[opt.value] = true;
+	}
     chrome.storage.sync.set({
         last_version: DEFAULT_OPTIONS.last_version,
         minimumTrackDuration: {
@@ -60,7 +65,8 @@ function save_options() {
         allowReposts: allow_reposts,
         allowPromoted: allow_promoted,
 		removeFiltered: remove_filtered,
-        onlyFilterStream: only_filter_stream
+        onlyFilterStream: only_filter_stream,
+		blockedRepostUsers: blocked_repost_users
     }, function () {
         setStatus("New BSC configuration was applied. Refresh any SoundCloud tabs now.", "info");
     });
@@ -72,12 +78,7 @@ function restore_options() {
             items = DEFAULT_OPTIONS;
             setStatus("BSC was updated... resetting options to defaults", "warn");
         }
-        /* document.getElementById('min_duration').value = items.minimumTrackDuration.as_str;
-        document.getElementById('max_duration').value = items.maximumTrackDuration.as_str;
-        document.getElementById('allow_playlists').checked = items.allowPlaylists;
-        document.getElementById('allow_reposts').checked = items.allowReposts;
-        document.getElementById('allow_promoted').checked = items.allowPromoted;
-		document.getElementById('remove_filtered').checked = items.removeFiltered; */
+		
 		set_options(items);
     });
 }
@@ -97,6 +98,16 @@ function set_options(opts) {
 		document.getElementById('remove_filtered').checked = opts.removeFiltered;
     if ('onlyFilterStream' in opts)
         document.getElementById('only_filter_stream').checked = opts.onlyFilterStream;
+	if ('blockedRepostUsers' in opts) {
+		var sel = document.querySelector('#blocked_users_select');
+		sel.setAttribute('size', Math.max(1, Math.min(10, Object.keys(opts.blockedRepostUsers).length)));
+		for (var e in opts.blockedRepostUsers) {
+			var opt = document.createElement('option');
+			opt.value = e;
+			opt.textContent = e;
+			sel.appendChild(opt);
+		}
+	}
 }
 
 function convertTimeFieldToSeconds(time_str) {
@@ -111,6 +122,18 @@ function convertTimeFieldToSeconds(time_str) {
 
 var input_ids = ['min_duration', 'max_duration', 'allow_playlists', 'allow_reposts', 'allow_promoted', 'remove_filtered', 'only_filter_stream'];
 document.addEventListener('DOMContentLoaded', function() {
+	document.getElementById('unblock_user_button').addEventListener('click',
+		function() {
+			var opts = document.getElementById('blocked_users_select');
+			var sel_opts = opts.selectedOptions;
+			var opts_to_rem = [];
+			for (var i=0; i<sel_opts.length; i++) {
+				opts_to_rem.push(sel_opts[i]);
+			}
+			for (var o in opts_to_rem) {
+				opts.remove(opts_to_rem[o].index);
+			}
+		});
 	document.getElementById('save').addEventListener('click',
         function() {
             var bad = false;

@@ -9,6 +9,7 @@ BSC can hide or remove tracks depending on the following criteria:
 * If it is a promoted post
 * If it is a playlist
 * If it is on your stream or a user's profile
+* If it is a repost from a blocked user
 
 The platform is qutie extensible and custom filters can be written fairly easily to perform other DOM related operations to the feed.
 

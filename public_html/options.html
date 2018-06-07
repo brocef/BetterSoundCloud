@@ -27,13 +27,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
             <h1 class="bsc_centered_text">Better SoundCloud</h1>
 
-            <p>Notes on use:</p>
-            <ul>
-                <li>By default no results are filtered except promoted posts</li>
-                <li>Playlists are not examined&#8212;meaning that the duration filter does not apply</li>
-                <li>A single song is typically less than 240 seconds (4 minutes)</li>
-                <li>Bug reports are appreciated</li>
-            </ul>
+			<div id="notes">
+				<div>
+					<p>Notes on use:</p>
+					<ul>
+						<li>By default no results are filtered except promoted posts</li>
+						<li>Playlists are not examined&#8212;meaning that the duration filter does not apply</li>
+						<li>A single song is typically less than 240 seconds (4 minutes)</li>
+						<li>Bug reports are appreciated</li>
+					</ul>
+				</div>
+			</div>
 
             <p>&nbsp;</p>
 
@@ -93,9 +97,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 				
 				<tr><td colspan="3">&nbsp;</td></tr>
 
+				<tr id="blocked_users_row">
+					<td>Users whose reposts are blocked</td>
+					<td>
+						<select id="blocked_users_select" multiple>
+						</select>
+					</td>
+					<td>
+						<button type="button" id="unblock_user_button">Remove</button>
+					</td>
+				</tr>
+				
+				<tr><td colspan="3">&nbsp;</td></tr>
+				
                 <tr>
 					<td>&nbsp;</td>
-                    <td><button type="button" id="save">Save</button></td>
+                    <td><button type="button" id="save">Apply</button></td>
 					<td>&nbsp;</td>
                 </tr>
             </table>

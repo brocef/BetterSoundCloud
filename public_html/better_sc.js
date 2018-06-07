@@ -158,7 +158,7 @@ function parseSCItem(sc_item) {
     var artist_a = sel("div.soundTitle__secondary > a.soundTitle__username");
 
     var poster_parent = sel("div.soundTitle__secondary > div.soundTitle__info, div.activity > div.streamContext > div.soundContext > span.soundContext__line");
-	
+	//.sc-ministats-reposts
 	var poster_a;
 	var is_repost;
 	
@@ -168,7 +168,7 @@ function parseSCItem(sc_item) {
 		is_repost = false;
 	} else {
 		var poster_a = poster_parent.querySelector("a:first-child");
-		var is_repost = poster_parent.querySelector("span.soundContext__repost") !== null;
+		var is_repost = poster_parent.querySelector("span.soundContext__repost, .sc-ministats-reposts") !== null;
 	}
 	
     var is_promoted = sel("span.sc-promoted-icon") !== null;
@@ -298,13 +298,24 @@ function processSCItem(sc_item, cfg) {
     
 	if (sc_item.hasAttribute("bscVisited")) return;
 	sc_item.setAttribute("bscVisited", "true");
-    
+	
     if (cfg['onlyFilterStream'] && window.location.pathname != "/stream") {
         return;
     }
     
     var sc_obj = parseSCItem(sc_item);
 
+	if (sc_obj.is_repost) {
+		var toggleBlock = document.createElement('span');
+		blockUserReposts(cfg, sc_obj.values.poster.name, toggleBlock, cfg.blockedRepostUsers[sc_obj.values.poster.name]);
+		
+		toggleBlock.style.marginLeft = "5px";
+		toggleBlock.style.cursor = "pointer";
+		toggleBlock.style.fontFamily = "monospace";
+		toggleBlock.addEventListener('click', mkToggleBlockClickListener(cfg, sc_obj));
+		sc_obj.dom.poster_a.parentElement.parentElement.appendChild(toggleBlock);
+	}
+	
     var filter_list = filter_handler.getFilterList();
     for (var i = 0; i < filter_list.length; i++) {
         var r = filter_list[i](sc_obj, cfg);
@@ -329,7 +340,6 @@ function processSCItem(sc_item, cfg) {
 			bsc_repl_show.classList.add("bsc_show");
 			bsc_repl_p.appendChild(bsc_repl_show);
 
-			
 			bsc_repl_show.addEventListener("click", mkHideShowClickListener(sc_item_div));
 
 			sc_item.insertBefore(bsc_repl_p, sc_item_div);
@@ -341,6 +351,31 @@ function processSCItem(sc_item, cfg) {
 		
         break;
     }
+}
+
+function blockUserReposts(cfg, poster_name, toggleBlock, blocked) {
+	if (blocked) {
+		toggleBlock.textContent = "[unblock reposts]";
+		toggleBlock.style.color = "#0000FF";
+		toggleBlock.classList.add("blocked");
+		cfg.blockedRepostUsers[poster_name] = true;
+	} else {
+		toggleBlock.textContent = "[ block reposts ]";
+		toggleBlock.style.color = "#FF0000";
+		toggleBlock.classList.remove("blocked");
+		delete cfg.blockedRepostUsers[poster_name];
+	}
+	
+	chrome.storage.sync.set({
+		blockedRepostUsers: cfg.blockedRepostUsers
+	}, function () {});
+}
+
+function mkToggleBlockClickListener(cfg, sc_obj) {
+	return function (evt) {
+		var toggleBlock = evt.currentTarget;
+		blockUserReposts(cfg, sc_obj.values.poster.name, toggleBlock, !toggleBlock.classList.contains("blocked"));
+	}
 }
 
 function mkHideShowClickListener(sc_item_div) {
@@ -371,6 +406,13 @@ var filter_handler = (function() {
         }
         return false;
     };
+	
+	filters.filter_repost_from_user = function(sc_obj, cfg) {
+		if (sc_obj.is_repost && cfg.blockedRepostUsers[sc_obj.values.poster.name]) {
+			return sc_obj.values.track.name + " was filtered out because reposts from " + sc_obj.values.poster.name + " are blocked";
+		}
+		return false;
+	};
 
     filters.filter_playlist = function(sc_obj, cfg) {
         if (!cfg.allowPlaylists && sc_obj.playlist) {
@@ -433,7 +475,7 @@ function init() {
             cfg = DEFAULT_OPTIONS;
             //TODO: Notify the user that the version changed and the settings were reset
         }
-        
+		
 		var orig_pathname = window.location.pathname;
 		
 		// If the page we're on is not the page init() was called on, then bail
@@ -490,7 +532,7 @@ function init() {
             bsc_help_p.textContent = 'Not working? Try scrolling to the bottom or refreshing.';
             
             var bsc_help_p2 = document.createElement('p');
-            bsc_help_p2.textContent = 'If all else fails, report a bug ';
+            bsc_help_p2.textContent = 'If you have blocked a user, you need to refresh. If all else fails, report a bug ';
             
             var bsc_help_a = document.createElement('a');
             bsc_help_a.href = 'https://github.com/brocef/BetterSoundCloud/issues';

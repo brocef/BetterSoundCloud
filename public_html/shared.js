@@ -29,7 +29,8 @@ var DEFAULT_OPTIONS = {
         allowReposts: true,
         allowPromoted: false,
 		removeFiltered: false,
-        onlyFilterStream: false
+        onlyFilterStream: false,
+		blockedRepostUsers: {}
     };
 
 if (chrome && chrome.runtime) {	
