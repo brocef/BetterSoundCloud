@@ -110,7 +110,8 @@ input, select {
 }
 
 .bsc_options_table {
-    width: 100%;
+    padding: 0 200px;
+	min-width: 500px;
     height: auto;
     margin: 0 auto;
 }
@@ -129,18 +130,18 @@ input, select {
 }
 
 .bsc_options_table tr > td:nth-child(1) {
-    width: 25%;
+    width: 35%;
     text-align: right;
 }
 
 .bsc_options_table tr > td:nth-child(2) {
-    width: 50%;
+    width: 30%;
     /* padding: 0 16px 0 0; */
     text-align: center;
 }
 
 .bsc_options_table tr > td:nth-child(3) {
-    width: 25%;
+    width: 35%;
     font-size: 9pt;
     text-align: left;
 }
