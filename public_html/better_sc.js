@@ -17,13 +17,14 @@
 /* global chrome, DEFAULT_OPTIONS */
 
 var BSC = {};
-initBSC();
 
 function initBSC() {
 	BSC = {
 		'filtered_tracks': 0
 	};
 }
+
+initBSC();
 
 /**
  * Ignore this function--its a fancy way to do something when the document is loaded and ready.
@@ -466,7 +467,11 @@ function initialParse(cfg) {
 }
 
 function getTargetList() {
-    return document.querySelector("body > div#app > div#content div.userStream__list > ul.soundList, body > div#app > div#content div.stream__list > div.lazyLoadingList > ul.lazyLoadingList__list");
+    var target = document.querySelector("body div#content div.stream__list > div.lazyLoadingList > ul.lazyLoadingList__list");
+    if (target === null) {
+        target = document.querySelector("body div#content ul.soundList");
+    }
+    return target;
 }
 
 function init() {
@@ -645,16 +650,14 @@ docReady(function () {
 				}
 				
                 var content = document.querySelector("#content");
-				
+
 				var content_obs_callback = function (mutations) {
-					var nodesWereRemoved = false;
                     for (var i = 0; i < mutations.length; i++) {
                         if (mutations[i].removedNodes.length > 0) {
-							nodesWereRemoved = true;
-							break;
+							return true;
                         }
                     }
-					return nodesWereRemoved;
+					return false;
                 };
 				
 				var init_user_stream_obs = function() {
@@ -685,7 +688,6 @@ docReady(function () {
                 content_obs = new MutationObserver(function(mutations) {
 					if (content_obs_callback(mutations)) {
 						init_user_stream_obs();
-						
 						initBSC();
 						init();
 					}
